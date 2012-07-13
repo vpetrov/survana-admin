@@ -1,6 +1,15 @@
 {
-	"name":"idata",
-	"version":"0.0.1",
-	"author":"Victor Petrov <victor_petrov@harvard.edu>",
-	"description":"An HTML5 application for administering questionnaires on tablets and mobile devices by the Neuroinformatics Research Group at Harvard University."	
+	"name":		"idata-admin",
+	"version":	"0.0.1",
+	"author":	"Victor Petrov <victor_petrov@harvard.edu>",
+	"description":"iData administration module",
+	"repository":{
+		"type":	"git",
+		"url":	"https://github.com/vpetrov/idata-admin.git"
+	},
+	"keywords":["idata","questionnaire","form","mobile","admin"],
+	"license":"New BSD",
+    "dependencies":{
+        "idata":"0.0.1"
+    }
 }
