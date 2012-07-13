@@ -1,6 +1,6 @@
 {
 	"name":		"idata-admin",
-	"version":	"0.0.1",
+	"version":	"0.0.1a",
 	"author":	"Victor Petrov <victor_petrov@harvard.edu>",
 	"description":"iData administration module",
 	"repository":{
@@ -10,6 +10,8 @@
 	"keywords":["idata","questionnaire","form","mobile","admin"],
 	"license":"New BSD",
     "dependencies":{
-        "idata":"0.0.1"
+        "idata":    "0.0.1",
+        "express":  ">= 3.0",
+        "ejs":      ">= 0.7.2"
     }
 }

@@ -10,5 +10,5 @@ exports.load=function(mconf)
 
 exports.go=function()
 {
-	console.log('Config:',this.config);
+	
 }
