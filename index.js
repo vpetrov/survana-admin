@@ -8,7 +8,7 @@ exports.load=function(mconf)
 	this.config=mconf;
 }
 
-exports.go=function()
+exports.run=function()
 {
-	
+	console.log('Starting module '+prefix+' on port '+this.config.port);
 }
