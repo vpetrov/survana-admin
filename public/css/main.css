@@ -1,0 +1,72 @@
+body
+{
+	background-color: #FEFEFE; /* testing */
+}
+
+.build-pad-mv
+{
+	padding-top:10px;
+	padding-bottom:10px;
+}
+
+.build-caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  vertical-align: top;
+  border-top: 4px solid #000000;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  content: "";
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+
+ul li a span.build-caret
+{
+	margin-top:8px;
+}
+
+.build-draggable
+{
+	border:1px solid #08C;
+	overflow:hidden;
+}
+
+a.build-draggable:hover
+{
+	background-color:transparent !important;
+}
+
+li a.build-draggable
+{
+	margin-bottom:3px;
+}
+
+.build-form-remove
+{
+	opacity:0.4;
+	background-color:red !important;
+}
+	
+.ui-draggable-dragging a
+{
+    color:white;
+    background-color:#08C;
+    border-radius:5px;
+}
+
+.nav li.active a:hover
+{
+    color:#ddd !important;
+}
+    
+.nav li.active a b
+{
+    float:right;
+}
+
+.nav li.active a span
+{
+    margin-left:10px;
+}

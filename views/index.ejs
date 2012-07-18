@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{= config.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{= config.title }}">
+    <meta name="author" content="Victor Petrov">
+
+    <!-- Le styles -->
+    <link href="{{=config.prefix}}js/{{=config.lib.bootstrap}}/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="{{=config.prefix}}js/{{=config.lib.bootstrap}}/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link href="{{=config.prefix}}css/main.css" rel="stylesheet">
+  </head>
+
+  <body>
+      
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">{{= config.brand }}</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#create/study">Create</a></li>
+              <li><a href="#about" onclick="return false">About</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<div id='content'>
+    &nbsp;
+</div>
+
+<!-- client side templates -->
+<script id='tpl-home' type='text/template'>
+    <div class="container">
+        <div class="row">
+            <div class="span5" id="main-content">
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id='tpl-welcome' type='text/template'>
+    <div>
+        You must be new here.
+    </div>
+</script>
+
+<script id='tpl-form-create' type='text/template'>
+    <div class="container">
+        <!-- left menu -->
+        <div class="row">
+        
+            <!-- sidebar -->
+            <div id='sidebar' class="span2">
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">Create</li>
+                        <li><a href="#create/study">Study</a></li>
+                        <li class="active"><a href="#create-form">Questionnaire</a></li>
+                    </ul>
+                </div>
+                
+                <div class="spacer">&nbsp;</div>
+
+                <div id='sidebar-form-groups' class="sidebar-nav"></div>
+            </div>
+        
+            <!-- main container -->
+            <div class="span6">
+                <div class="container">
+                    <div class="row span6" id="messages"></div>
+                    <div class="row span6">
+                        <div class="page-header">
+                            <h1>Create Questionnaire
+                                <small>// expert mode</small>
+                            </h1>
+                        </div>
+                        <form id='create-form' class="form-vertical">
+                          <fieldset>
+                            <div class="control-group">
+                              <label class="control-label" for="form-title">Name</label>
+                              <div class="controls">
+                                  <input type="text" class="span3" id="form-title" name="title" rel="tooltip" title="Use one or two words">
+                              </div>
+                              <label class="control-label" for="form-code">Code</label>
+                              <div class="controls">
+                                  <input type="text" class="span1" id="form-code" name="code" rel="tooltip" title="All response codes will have this prefix">
+                                  e.g. <code>DEM</code>, <code>EH</code>, <code>LIFE</code>
+                              </div>
+                              <label class="control-label" for="form-version">Version</label>
+                              <div class="controls">
+                                  <input type="text" class="span1" id="form-version" name="version" value="1.0" rel="tooltip" title="The version number is used to keep track of future changes to this questionnaire">
+                                  e.g. <code>0.1</code>, <code>first</code>
+                              </div>
+                            </div>
+                          </fieldset>
+                          
+                          <fieldset>
+                          <legend>JSON: <small>// mustache syntax</small></legend>
+                            <br>    
+                            <textarea rows="20" class="span6" id='form-data' name='data'>
+{
+    "form":   "Name",
+    "title":  "title"
+}
+                            </textarea>
+                          </fieldset>
+                          <hr>
+                          <input type="submit">
+                          <input type="reset" value="Clear">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</script>
+
+<script id='tpl-study-create' type='text/template'>
+    <div class="container">
+        <!-- left menu -->
+        <div class="row">
+        
+            <!-- sidebar -->
+            <div id='sidebar' class="span2">
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">Create</li>
+                        <li class="active"><a href="#create/study">Study</a></li>
+                        <li><a href="#create/form">Questionnaire</a></li>
+                    </ul>
+                </div>
+                
+                <div class="spacer">&nbsp;</div>
+
+                
+                <div id='sidebar-form-groups' class="sidebar-nav"></div>
+            </div>
+        
+            <!-- main container -->
+            <div class="span6">
+                <div class="container">
+                    <div class="row span6" id="messages"></div>
+                    <div class="row span6">
+                        <div class="page-header">
+                            <h1>Create Study
+                                <small>and other things</small>
+                            </h1>
+                        </div>
+                        <form id='create-study' class="form-vertical">
+                          <fieldset>
+                            <div class="control-group">
+                              <label class="control-label" for="study-title">Title</label>
+                              <div class="controls">
+                                  <input type="text" class="span4" id="study-title" name="title">
+                              </div>
+                            </div>
+                          </fieldset>
+                          
+                          <fieldset>
+                          <legend>Forms <small>// drag and drop here:</small></legend>
+                              <div id='study-forms-container' class="span6 build-pad-mv" style="margin-left:0px"></div>
+                          </fieldset>
+                          
+                          <input type="submit">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id='tpl-study-view' type='text/template'>
+    <div class="container">
+        <!-- left menu -->
+        <div class="row">
+        
+            <!-- sidebar -->
+            <div id='sidebar' class="span2">
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">Menu</li>
+                        <li class="active"><a href="#" onclick="return false">Details</a></li>
+                        <% if (published) { %>
+                            <li><a href="#" onclick="return false">Responses</a></li>
+                        <% } %>
+                    </ul>
+                </div>
+
+                <div class="spacer">&nbsp;</div>
+
+                
+                <div id='sidebar-form-groups' class="sidebar-nav"></div>
+            </div>
+            
+            <!-- main container -->
+            <div class="span6">
+                <div class="container">
+                    <div class="row span6" id="messages"></div>
+                    <div class="row span6">
+                        <div class="page-header">
+                            <h1><%- title %>
+                                <small>
+                                <% if (published) { %>
+                                    <span class="label label-success" rel="tooltip" title="This study has been published" style="font-size:larger">Published</span>
+                                <% } else { %>
+                                    <span class="label" rel="tooltip" title="This study has not been published yet" style="font-size:larger">Draft</span>
+                                <% } %>
+
+                                </small>
+                            </h1>
+                        </div>
+                        <div class="well">                            
+                            <div class="row">
+                                <div class="span1">ID:</div>
+                                <div class="span3"><strong><%- id %></strong></div>
+                            </div>
+                            
+                            <% if (published) {%>
+                                <div class="row">
+                                    <div class="span1">URL:</div>
+                                    <% var study_url="{{= config.study_url_prefix }}"+id %>
+                                    <div class="span3"><a href='<%- study_url %>'><%- study_url %></a></div>
+                                </div>
+                            <% } %>
+                        </div>
+                        <h4>Forms:</h4>
+                        <br>
+                        <ol>
+                            <% for(var i=0;i<forms.length;++i) { %>
+                                <li>
+                                        <strong><%- forms[i].title %></strong>
+                                            <code><%- forms[i].version %></code>
+
+                                </li>
+                            <% } %>
+                        </ol>
+                        <hr>
+                        
+                        <% if (!published) { %>
+                            <a id='btn-study-publish' class="btn btn-primary btn-medium" href="#">Publish</a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="tpl-study-list" type="text/template">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Study</th>
+                <th>Status</th>
+                <td>Created On</td>
+            </tr>
+        </thead>
+        <tbody>
+            <% _.each(items,function(item){ %>
+                <%= itemTemplate(item) %>
+            <% }); %>
+        </tbody>
+    </table>
+</script>
+
+<script id="tpl-study-list-item" type="text/template">
+    <tr>
+        <td>
+            <a href="#study/<%- obj.id %>">
+                <%- title %></td>
+            </a>
+        <td>
+            <% if (published) { %>
+                <span class="label label-success" rel="tooltip" title="This study has been published" >Published</span>
+            <% } else { %>
+                <span class="label" rel="tooltip" title="This study has not been published yet">Draft</span>
+            <% } %>
+        </td>
+        <td>
+            <% var d=new Date(created_on*1000); %> 
+            <%- d.toLocaleDateString() %>
+        </td>
+    </tr>
+</script>
+
+<!-- titles: Array -->
+<script id="tpl-form-list" type="text/template">
+        <ul id='form-list' class="nav nav-list">
+            <li class="nav-header">Forms</li>
+            <%  _.each(items,function(item){ %>
+                <%= itemTemplate(_.last(item)) %> 
+            <% }); %>
+        </ul>
+</script>
+
+<!-- title: string -->
+<script id="tpl-form-list-item" type="text/template">
+    <li class="draggable"><a href="#" class="build-draggable" data-form-id='<%- id %>'><%- group %></a></li>
+</script>
+
+<!-- study forms -->
+<script id="tpl-study-forms" type="text/template">
+    <ul id='study-forms' class="nav nav-pills nav-stacked well sortable-list">
+        <% _.each(items,function(item){ %>
+            <%= itemTemplate(item) %>
+        <% }); %>
+    </ul>
+</script>
+
+<script id="tpl-study-forms-item" type="text/template">
+    <li class="active dropdown">
+        <%= titleTemplate(item) %>
+        <%= menuTemplate({'group':group}) %>
+    </li>
+</script>
+
+<script id="tpl-study-forms-title" type="text/template">
+    <a data-toggle="dropdown" class="dropdown dropdown-toggle">
+        <%- title %>
+        <span class="label label-warning"><%- version %></span>
+        <b class="caret"></b>
+    </a>
+</script>
+
+<script id="tpl-study-forms-menu" type="text/template">
+    <ul class="dropdown-menu">
+        <li><span style="border-top:1px solid lightgray;display:block"></span></li>
+        <% for (var i=0; i<group.length;++i) { %>
+        <li>
+            <a href="#" data-form-id='<%- group[i].id %>'>
+                <%- group[i].title %> 
+                <span class="label label-warning"><%- group[i].version %></span>
+            </a>
+        </li>
+        <% } %>
+    </ul>
+</script>
+
+<script id="tpl-alert" type="text/template">
+    <div class="alert">
+        <button class="close" data-dismiss="alert">×</button>
+        <span class="alert-message"><%- arguments[0] %></span>
+    </div>
+</script>
+
+<?php //message is unescaped ?>
+<script id='tpl-modal-alert' type="text/template">
+    <div class="modal hide">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h3><%- title %></h3>
+      </div>
+      <div class="modal-body">
+        <p><%= message %></p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+      </div>
+    </div>
+</script>
+
+<script id="store-forms" type="text/store">
+    {{- JSON.stringify(forms) }}
+</script>
+
+<script id="store-studies" type="text/store">
+    {{- JSON.stringify(studies) }}
+</script>
+
+
+<script data-main="{{=config.prefix}}js/app" src="{{=config.prefix}}js/{{=config.lib.require}}/require.js"></script>
+<script type="text/javascript">
+    //configure RequireJS
+    requirejs.config({
+        //url to all javascript files
+        baseUrl:    "{{= config.prefix }}js",
+        //print all the dependencies, in a way that requirejs can reach them
+        paths:  {{- JSON.stringify(require_libs) }},
+        //specify that backbone depends on jquery and returns a global 'Backbone' object
+        shim:{
+            'backbone':{
+                deps:['underscore','jquery'],
+                exports:'Backbone'
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
