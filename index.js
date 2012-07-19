@@ -4,6 +4,7 @@ var name=require("./package.json").name;
 
 exports.config=require('./config');
 
+
 exports.server=function(idata,express)
 {
 	var app=this.app=express.createServer();
@@ -15,6 +16,7 @@ exports.server=function(idata,express)
 		app.set('view options',{
 			layout:false
 		});
+
         app.use(express.methodOverride());
         app.use(express.bodyParser());
         app.use(app.router);
@@ -41,6 +43,15 @@ exports.server=function(idata,express)
 	app.log.info('reporting in!');
 	
 	app.config=this.config;
+	app.dbserver=new idata.db(this.config.db);
+	
+	//open a database connection
+	app.dbserver.connect(function(db){
+		app.db=db;
+	},
+	function(error){
+		throw error;
+	});
 	
 	return this.app;
 }

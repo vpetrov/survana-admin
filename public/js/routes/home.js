@@ -5,15 +5,18 @@ define([
 		],
 function($,HomeView,StudyList)
 {
-	return function()
+	return function(options)
 	{
 		console.log('home');
+		
+		var store=options.store;
+
 		if (!this.homeView)
 		{
 			this.homeView=new HomeView({
-				collection:new StudyList()
+				collection:store.forms,
+				study_collection:store.studies
 			});
-
 			this.homeView.render();
 		}
 		else

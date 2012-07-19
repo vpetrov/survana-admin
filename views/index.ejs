@@ -38,7 +38,7 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
-              <li><a href="#create/study">Create</a></li>
+              <li><a href="#study/create">Create</a></li>
               <li><a href="#about" onclick="return false">About</a></li>
             </ul>
           </div>
@@ -76,7 +76,7 @@
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
                         <li class="nav-header">Create</li>
-                        <li><a href="#create/study">Study</a></li>
+                        <li><a href="#study/create">Study</a></li>
                         <li class="active"><a href="#create-form">Questionnaire</a></li>
                     </ul>
                 </div>
@@ -96,7 +96,7 @@
                                 <small>// expert mode</small>
                             </h1>
                         </div>
-                        <form id='create-form' class="form-vertical">
+                        <form id='create-form' class="form-vertical" onsubmit="return false">
                           <fieldset>
                             <div class="control-group">
                               <label class="control-label" for="form-title">Name</label>
@@ -148,8 +148,8 @@
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
                         <li class="nav-header">Create</li>
-                        <li class="active"><a href="#create/study">Study</a></li>
-                        <li><a href="#create/form">Questionnaire</a></li>
+                        <li class="active"><a href="#study/create">Study</a></li>
+                        <li><a href="#form/create">Questionnaire</a></li>
                     </ul>
                 </div>
                 
@@ -363,7 +363,7 @@
 <script id="tpl-alert" type="text/template">
     <div class="alert">
         <button class="close" data-dismiss="alert">×</button>
-        <span class="alert-message"><%- arguments[0] %></span>
+        <span class="alert-message"><%- message %></span>
     </div>
 </script>
 

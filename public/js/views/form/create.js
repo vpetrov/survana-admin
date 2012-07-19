@@ -13,6 +13,7 @@ function($,_,Backbone,Form,Alert,Errors)
     	
     	initialize:function(){
     		console.log('Initializing Create Form View');
+    		console.log('Alert id',Alert);
     		
     		_.bindAll(this,'onSubmit','onSubmitError','onValidationError');
     	},
@@ -66,7 +67,7 @@ function($,_,Backbone,Form,Alert,Errors)
 	    
 	    onSubmitError:function(model,result,caller)
 	    {
-	    	Errors.onSubmitError(this,model,result,caller);
+	    	Errors.onSubmit(this,model,result,caller);
 	    },
 	    
 		onValidationError:function(model,errors)

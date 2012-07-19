@@ -10,12 +10,14 @@ function($,_,Backbone,StudyListView)
     	template:_.template($('#tpl-home').html()),
     	welcomeTemplate:_.template($('#tpl-welcome').html()),
     	studyListView:null,
+    	studyCollection:[],
     	
-    	initialize:function(){
-    		console.log('Initializing Home View',this.collection);
+    	initialize:function(options){
+    		
+    		this.studyCollection=options.study_collection;
     		
     		this.studyListView=new StudyListView({
-    			collection:this.collection
+    			collection:this.studyCollection
 			});
     	},
     	
@@ -26,8 +28,9 @@ function($,_,Backbone,StudyListView)
     	render:function(){
     		$(this.el).html(this.template());
     		this.studyListView.render();
+
     		//display a list of all studies
-    		if (this.collection && this.collection.length)
+    		if (this.studyCollection && this.studyCollection.length)
     			$(this.el).find('#main-content').html(this.studyListView.el);
     		else
     		//display a welcome page

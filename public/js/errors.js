@@ -5,7 +5,9 @@ define([
 function($,Alert)
 {
 	return {
-	    onSubmit:function(view,model,result,caller){
+	    onSubmit:function(view,model,result,caller)
+ 	    {
+ 	    	console.log('Errors.onSubmit',arguments);
 	      	//if the result is not jqXHR, then it is a validation error
 	        if (typeof(result['readyState'])==='undefined')
 	        	return view.onValidationError(model,result);
@@ -22,7 +24,7 @@ function($,Alert)
 						}
 						catch (err)
 						{
-							return App.show('The server was unable to validate your request. Please try again in a moment.');
+							return Alert.show('The server was unable to validate your request. Please try again in a moment.');
 						}
 	
 						//tell the view to render the errors returned by the server

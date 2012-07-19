@@ -4,9 +4,9 @@ define([
 		],
 function($,CreateFormView)
 {
-	return function()
+	return function(options)
 	{
-		console.log('create_form');
+		console.log('create_form',options);
 		
 		this.createFormView=new CreateFormView();
 		this.createFormView.render();

@@ -1,19 +1,24 @@
 define([
 			'jquery',
+			'underscore',
 			'views/study/view'
 		],
-function($,ViewStudyView)
+function($,_,ViewStudyView)
 {
-	return function(sid)
+	return function(sid,options)
 	{
-		console.log('view_study');
+		var store=options.store;
+		
+		console.log('view_study',options);
+		
 		if (!this.cache)
 			this.cache=[];
 			
 		if (!_.has(this.cache,sid))
 		{
 			this.cache[sid]=new ViewStudyView({
-				model:App.studies.get(sid) //TODO: replace with something else
+				collection:store.forms,
+				model:store.studies.get(sid)
 			});
 			this.cache[sid].render();
 		}

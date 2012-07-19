@@ -10,10 +10,8 @@ function($,_,Backbone,Alert)
     	template:_.template($('#tpl-study-view').html()),
     	forms:[],
     	
-    	initialize:function(col)
-    	{
-    		this.collection=col;
-    		
+    	initialize:function(options)
+    	{    		
     		_.bindAll(this,'render','publish','onPublishClick');
     		
     		if (!this.model)

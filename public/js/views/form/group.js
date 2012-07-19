@@ -1,7 +1,8 @@
 define([
 			'jquery',
 			'underscore',
-			'backbone'
+			'backbone',
+			'jquery-ui'
 		],
 function($,_,Backbone)
 {
@@ -12,10 +13,10 @@ function($,_,Backbone)
         
         clickHandler:null,
         
-        initialize:function(col){
+        initialize:function(options){
+        	console.log('Initializing FormGroupView',options)
             _.bindAll(this,'render','addItem','draggable');
             
-            this.collection=col;
             this.collection.on("change reset",this.render);
             this.collection.on("add",this.addItem)
         },
@@ -59,7 +60,6 @@ function($,_,Backbone)
         
         click:function(fn)
         {
-        	console.log('form list click',fn);
         	this.clickHandler=fn;
         },
         

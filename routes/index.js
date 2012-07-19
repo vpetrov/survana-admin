@@ -1,4 +1,7 @@
 var path=require('path');
+var step=require('step');
+
+var forms=require('./store/forms.json'); //TODO: remove me
 
 function requirejs_libs(config)
 {
@@ -11,13 +14,40 @@ function requirejs_libs(config)
 }
 
 exports.index=function(req,res)
-{
-	console.log(req.app.config);
+{	
+	console.log(req.originalUrl);
+	var len=req.originalUrl.length;
 	
-	res.render('index',{
-		config:req.app.config,
-		require_libs:requirejs_libs(req.app.config),
-		forms:{},
-		studies:{}
-	});
+	//make sure the browser is using a trailing slash
+	if (req.originalUrl[len-1]!=='/')
+		return res.redirect(req.originalUrl+'/');
+	
+	step(
+		//get the 'study' collection
+		function getCollection(){
+			req.app.db.collection('study',this)
+		},
+		
+		//find all study documents
+		function findAllStudies(err,col){
+			if (err)
+				throw err;
+				
+			col.find({}).toArray(this);
+		},
+		
+		//render the page
+		function displayPage(err,studies)
+		{
+			if (err)
+				throw err;
+				
+			res.render('index',{
+				config:req.app.config,
+				require_libs:requirejs_libs(req.app.config),
+				forms:forms,
+				studies:studies
+			});
+		}
+	);
 }

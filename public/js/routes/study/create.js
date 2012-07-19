@@ -4,11 +4,15 @@ define([
 		],
 function($,CreateStudyView)
 {
-	return function()
+	return function(options)
 	{
+		var store=options.store;
 		console.log('create_study');
 		
-		this.createStudyView=new CreateStudyView();
+		this.createStudyView=new CreateStudyView({
+				collection:store.studies,
+				forms:store.forms
+			});
 		this.createStudyView.render();
 			
 		$('#content').html(this.createStudyView.el);

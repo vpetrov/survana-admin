@@ -2,13 +2,14 @@ define([
 			'jquery',
 			'underscore',
 			'backbone',
+			'bootstrap',
 			'models/study',
 			'views/form/group',
 			'views/study/forms',
 			'views/alert',
 			'errors'
 		],
-function($,_,Backbone,Study,FormGroupView,StudyFormsView,Alert,Errors)
+function($,_,Backbone,bootstrap,Study,FormGroupView,StudyFormsView,Alert,Errors)
 {
     return Backbone.View.extend({
     	template:_.template($('#tpl-study-create').html()),
@@ -16,18 +17,24 @@ function($,_,Backbone,Study,FormGroupView,StudyFormsView,Alert,Errors)
     	formGroupView:null,
     	studyFormsView:null,
     	
-    	initialize:function(col){
-    		console.log('Initializing Create Study View',col);
-    		
-    		this.collection=col;
+    	initialize:function(options)
+    	{
+    		console.log('Initializing Create Study View',options);
+    		    		console.log('Alert id',Alert);
+
+    		console.log('Errors',Errors);
 
     		_.bindAll(this, 'onSubmit', 'onSubmitError', 'onValidationError')
     		
 	        //left menu view
-	        this.formGroupView=new FormGroupView(col); //TODO: used to be App.forms
+	        this.formGroupView=new FormGroupView({
+	        	collection:options.forms
+        	});
 	
 	        //drop zone view
-	        this.studyFormsView=new StudyFormsView(col); //TODO: used to be App.forms
+	        this.studyFormsView=new StudyFormsView({
+	        	collection:options.forms
+        	});
 	        
 	        //connect the two views
 	        this.formGroupView.click(this.studyFormsView.insert);
@@ -101,7 +108,7 @@ function($,_,Backbone,Study,FormGroupView,StudyFormsView,Alert,Errors)
 		
 		onSubmitError:function(model,result,caller)
         {
-			Errors.onSubmitError(this,model,result,caller);			
+			Errors.onSubmit(this,model,result,caller);			
         },
 		
 		onValidationError:function(model,errors)

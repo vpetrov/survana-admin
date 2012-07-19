@@ -1,11 +1,12 @@
 define([
 			'jquery',
 			'underscore',
-			'backbone'
+			'backbone',
+			'bootstrap'
 		],
-function($,_,Backbone)
-{
-	return Backbone.View.extend({
+function($,_,Backbone,bootstrap)
+{	
+	var alertView=Backbone.View.extend({
 		container:'#messages',
 		template:_.template($('#tpl-alert').html()),
 		modalTemplate:_.template($('#tpl-modal-alert').html()),
@@ -25,7 +26,9 @@ function($,_,Backbone)
 		
 		show:function(message)
 		{
-			$(this.container).html(this.template(message||this.defaults.message));
+			$(this.container).html(this.template({
+				'message':message||this.defaults.message
+			}));
 			$(this.container).children('.alert').alert(); //bootstrap.alert()		
 		},
 		
@@ -43,5 +46,7 @@ function($,_,Backbone)
 			$(this.el).children('.modal').modal(); //bootstrap.modal()
 		}
 	});
+	
+	return new alertView();
 
 }); //define

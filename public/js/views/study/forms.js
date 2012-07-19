@@ -2,9 +2,11 @@ define([
 			'jquery',
 			'underscore',
 			'backbone',
+			'jquery-ui',
+			'bootstrap',
 			'models/form/list/proxy'
 		],
-function($,_,Backbone,FormListProxy)
+function($,_,Backbone,jQueryUI,bootstrap,FormListProxy)
 {
     return Backbone.View.extend({
         proxyCollection:null,
@@ -16,11 +18,11 @@ function($,_,Backbone,FormListProxy)
         sortStartedAt:-1,
         sortStoppedAt:-1,
         
-        initialize:function(col,second){
+        initialize:function(options){
+        	console.log('Initializing StudyFormsView',options);
             _.bindAll(this,'render','onItemInserted','getModel','getForms','sortStarted','sortEnded','insert','onMenuItemSelect',
             		  'onDragOut','onDragIn', 'onDragStop');
             
-            this.collection=col;
             this.collection.on("change",this.render);
             
             //proxy model
