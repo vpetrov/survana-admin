@@ -22,6 +22,7 @@
     <![endif]-->
 
     <link href="{{=config.prefix}}css/main.css" rel="stylesheet">
+    <script src="js/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
   </head>
 
   <body>
@@ -118,13 +119,7 @@
                           
                           <fieldset>
                           <legend>JSON: <small>// mustache syntax</small></legend>
-                            <br>    
-                            <textarea rows="20" class="span6" id='form-data' name='data'>
-{
-    "form":   "Name",
-    "title":  "title"
-}
-                            </textarea>
+                            <div id="code-editor-container">&nbsp;</div>
                           </fieldset>
                           <hr>
                           <input type="submit">
@@ -409,6 +404,5 @@
         }
     });
 </script>
-
 </body>
 </html>

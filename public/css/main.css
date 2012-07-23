@@ -70,3 +70,15 @@ li a.build-draggable
 {
     margin-left:10px;
 }
+
+#code-editor-container
+{
+	height:500px;
+}
+
+.code-editor
+{
+	position:relative;
+	width:50%;
+	height:500px;
+}

@@ -15,7 +15,6 @@ function requirejs_libs(config)
 
 exports.index=function(req,res)
 {	
-	console.log(req.originalUrl);
 	var len=req.originalUrl.length;
 	
 	//make sure the browser is using a trailing slash
@@ -28,12 +27,12 @@ exports.index=function(req,res)
 			req.app.db.collection('study',this)
 		},
 		
-		//find all study documents
+		//find all study documents, prevent _id from showing up
 		function findAllStudies(err,col){
 			if (err)
 				throw err;
-				
-			col.find({}).toArray(this);
+			
+			col.find({},{'_id':0}).toArray(this);
 		},
 		
 		//render the page
@@ -41,7 +40,7 @@ exports.index=function(req,res)
 		{
 			if (err)
 				throw err;
-				
+
 			res.render('index',{
 				config:req.app.config,
 				require_libs:requirejs_libs(req.app.config),

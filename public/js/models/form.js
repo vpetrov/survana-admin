@@ -6,7 +6,7 @@ function($,Backbone)
 {
     var result=Backbone.Model.extend(
     {
-    	url:'form',  //TODO: fix url
+    	urlRoot:'form',  //TODO: fix url
         defaults:function(){
             return {
                 gid:0,

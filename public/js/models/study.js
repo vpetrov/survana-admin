@@ -5,7 +5,7 @@ function(Backbone)
 {
     var result=Backbone.Model.extend(
 	{
-    	url:'study',
+    	urlRoot:'study',
     	defaults:function(){
     		return {
     			created_on:0,

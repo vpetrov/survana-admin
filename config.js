@@ -5,19 +5,24 @@ exports.routes={
     'GET':{
     	'/': 			'index',
     	'/study':		{'study':'list'},
-    	'/study/:id': 	{'study':'get'}
+    	'/study/:id': 	{'study':'get'},
+    	'/form':        {'form':'list'},
+    	'/form/:id':    {'form':'get'}
     },
     
     'POST':{
-    	'/study': 		{'study':'create'}
+    	'/study': 		{'study':'create'},
+    	'/form':        {'form':'create'}
     },
     
     'PUT':{
-    	'/study/:id': 	{'study':'update'}
+    	'/study/:id': 	{'study':'update'},
+    	'/form/:id':    {'form':'update'}
     },
     
     'DELETE':{
-    	'/study/:id': 	{'study':'remove'}
+    	'/study/:id': 	{'study':'remove'},
+    	'/form/:id':    {'form':'remove'}
     }
 };
 
@@ -28,7 +33,8 @@ exports.lib={
 	'jquery-ui':'lib/jquery/ui/1.8.21',
 	'require':'lib/require/2.0.4',
 	//'underscore':'lib/underscore/1.3.3'
-	'underscore':'lib/lodash/0.4.2'
+	'underscore':'lib/lodash/0.4.2',
+	'ace':'lib/ace/0.2.0'
 };
 
 /* default database config */

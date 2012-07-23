@@ -31,7 +31,7 @@ function($,Alert)
 						view.onValidationError(model,data);
 	
 						break;
-	
+				case 200: //a serious problem on the server, which leaked to the client (making the contents invalid)	
 				case 500: //problem on the server 
 						Alert.show('The server has experienced an internal error. Please try again later.','Server error')
 						break;

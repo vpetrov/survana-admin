@@ -20,9 +20,7 @@ function($,_,Backbone,bootstrap,Study,FormGroupView,StudyFormsView,Alert,Errors)
     	initialize:function(options)
     	{
     		console.log('Initializing Create Study View',options);
-    		    		console.log('Alert id',Alert);
-
-    		console.log('Errors',Errors);
+    		console.log('Router0',this.router);
 
     		_.bindAll(this, 'onSubmit', 'onSubmitError', 'onValidationError')
     		
@@ -61,8 +59,10 @@ function($,_,Backbone,bootstrap,Study,FormGroupView,StudyFormsView,Alert,Errors)
 	    
 	    onSubmit:function(e)
 	    {
-	    	console.log('on study create submit');
             var forms=this.studyFormsView.getForms();
+            var studies=this.collection; //for callbacks
+            var router=this.router; //for callbacks
+            console.log('Router',this.router)
 
             if (!forms.length)
             {
@@ -88,10 +88,11 @@ function($,_,Backbone,bootstrap,Study,FormGroupView,StudyFormsView,Alert,Errors)
 	            study.save({},{
 	            	'wait':true,
 	                'success':function(model,updates){
+	                	console.log('Router 2',this.router);
 	                    model.set(updates,{silent:true});
-	                    App.studies.add(model); //TODO: change App.studies to something more appropriate
+	                    studies.add(model);
 
-	                    App.router.navigate('study/'+model.get('id'),{'trigger':true}); //change App.router to something more appropriate
+	                    router.navigate('study/'+model.get('id'),{'trigger':true}); //change App.router to something more appropriate
 	                },
 	                'error':this.onSubmitError
 	            });                

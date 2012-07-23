@@ -4,16 +4,18 @@ define([
 			'backbone',
 			'models/form',
 			'views/alert',
-			'errors'
+			'errors',
+			'views/form/editor'
+//			'ace/ace'
 		],
-function($,_,Backbone,Form,Alert,Errors)
+function($,_,Backbone,Form,Alert,Errors,Editor)
 {
     return Backbone.View.extend({
     	template:_.template($('#tpl-form-create').html()),
+    	editor:null,
     	
-    	initialize:function(){
-    		console.log('Initializing Create Form View');
-    		console.log('Alert id',Alert);
+    	initialize:function(options){
+    		console.log('Initializing Create Form View',options);
     		
     		_.bindAll(this,'onSubmit','onSubmitError','onValidationError');
     	},
@@ -25,7 +27,19 @@ function($,_,Backbone,Form,Alert,Errors)
     	render:function()
     	{
     		$(this.el).html(this.template());
-	        
+    		
+    		if (!this.editor)
+    		{
+    			this.editor=new Editor();
+    			
+    			this.editor.render();
+    			this.$el.find('#code-editor-container').html(this.editor.el);
+    		}
+
+			console.log('editor',this.editor);
+    		//console.log(Ace); //NOTE: ace.edit('editor) needs to be called after the elemnt has been attached to the DOM
+
+
     		return this;
 	    },
 	    
@@ -34,6 +48,8 @@ function($,_,Backbone,Form,Alert,Errors)
 	    	console.log('on form create submit');
                 
             var data={};
+            var forms=this.collection;
+            var router=this.router;
             
             //copy all form values into the study object
             _.each($(e.currentTarget).serializeArray(),function(item,i){
@@ -48,9 +64,9 @@ function($,_,Backbone,Form,Alert,Errors)
 	                'success':function(model,updates)
 	                {
 	                    model.set(updates,{silent:true});
-	                    App.forms.add(model); //TODO: change App.forms to something appropriate
-	                    
-	                    App.router.navigate('create/study',{'trigger':true}); //TODO: change App.router to something more appropriate
+	                    forms.add(model);
+
+	                    router.navigate('study/create',{'trigger':true}); 
 	                },
 	                
 	                'error':this.onSubmitError

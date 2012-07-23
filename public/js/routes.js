@@ -8,12 +8,13 @@ define([
 		],
 function($,Backbone,Home,CreateForm,CreateStudy,ViewStudy)
 {
-	return Backbone.Router.extend({
+	var Router=Backbone.Router.extend({
 		
 		store:{},
 		
 		initialize:function(options){
-			this.store=options.store;
+			if (options)
+				this.store=options.store;
 			
 			console.log('router this.store',this.store);		
 		},
@@ -53,5 +54,7 @@ function($,Backbone,Home,CreateForm,CreateStudy,ViewStudy)
 							});
 						}
 	});
+	
+	return new Router();
 
 }); //define
