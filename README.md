@@ -1,4 +1,4 @@
-idata-admin
+survana-admin
 ===========
 
-iData Administration Module
+Survana Administration Module
