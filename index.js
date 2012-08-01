@@ -5,7 +5,7 @@ var name=require("./package.json").name;
 exports.config=require('./config');
 
 
-exports.server=function(idata,express)
+exports.server=function(survana,express)
 {
 	var app=this.app=express.createServer();
 
@@ -19,32 +19,32 @@ exports.server=function(idata,express)
 
         app.use(express.methodOverride());
         app.use(express.bodyParser());
-        app.use(app.router);
         app.use(express.static(__dirname+'/public'));
+        app.use(app.router);
 
-        app.log=idata.log.sub(name);
+        app.log=survana.log.sub(name);
         app.dirname=__dirname;
     });
-    
+
     app.configure('dev',function(){
     	app.use(express.errorHandler({
     		dumpExceptions:true,
     		showStack:true
     	}))
     });
-    
+
     app.configure('prod',function(){
     	app.use(express.errorHandler());
     });
-    
+
     //set up routes
-    idata.routing(app,this.config.routes);
-	
+    survana.routing(app,this.config.routes);
+
 	app.log.info('reporting in!');
-	
+
 	app.config=this.config;
-	app.dbserver=new idata.db(this.config.db);
-	
+	app.dbserver=new survana.db(this.config.db);
+
 	//open a database connection
 	app.dbserver.connect(function(db){
 		app.db=db;
@@ -52,6 +52,6 @@ exports.server=function(idata,express)
 	function(error){
 		throw error;
 	});
-	
+
 	return this.app;
 }

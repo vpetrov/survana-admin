@@ -15,10 +15,11 @@ function($,Backbone)
                 title:"",
                 version:"",
                 created_on:0,
-                data:""
+                data:"",
+                published:false
             };
         },
-        
+
         initialize:function(){
             if (!this.get("title")){
                 this.set({
@@ -28,38 +29,39 @@ function($,Backbone)
                     "title": 	this.defaults.title,
                     "version": 	this.defaults.version,
                     "created_on":this.defaults.created_on,
-                    "data":     this.defaults.data
+                    "data":     this.defaults.data,
+                    "published":this.defaults.published
                 });
             }
         },
-        
+
         clear:function(){
             this.destroy();
         },
-        
+
         validate:function(attr)
         {
         	var result={};
         	var e=0;
-        	
+
         	if (!attr.title)
         	{
         		result['title']='Please specify a name';
         		e=1;
         	}
-        	
+
         	if (!attr.code)
         	{
         		result['code']='Please specify a form code';
         		e=1;
         	}
-        	
+
         	if (!attr.version)
         	{
         		result['version']='Please specify a version number for this form'
         		e=1;
         	}
-        	
+
         	if (!attr.data)
         	{
         		result['data']='Please add questions to your form';
@@ -76,14 +78,13 @@ function($,Backbone)
         			result['data']=err.message;
         			e=1;
         		}
-        	} 
-        		
+        	}
+
         	if (e)
         		return result;
         }
-        
+
     });
-    
+
     return result;
 }); //define
-    

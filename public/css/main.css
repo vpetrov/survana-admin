@@ -48,7 +48,7 @@ li a.build-draggable
 	opacity:0.4;
 	background-color:red !important;
 }
-	
+
 .ui-draggable-dragging a
 {
     color:white;
@@ -60,7 +60,7 @@ li a.build-draggable
 {
     color:#ddd !important;
 }
-    
+
 .nav li.active a b
 {
     float:right;
@@ -81,4 +81,5 @@ li a.build-draggable
 	position:relative;
 	width:50%;
 	height:500px;
+    border:1px solid lightgray;
 }

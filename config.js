@@ -1,5 +1,6 @@
-exports.title='iData Administration';
-exports.study_url_prefix='http://vpetrov.neuroinfo.org/';
+exports.title='Survana Administration';
+//exports.study_url_prefix='http://vpetrov.neuroinfo.org/';
+exports.study_url_prefix="http://localhost:8000/";
 
 exports.routes={
     'GET':{
@@ -9,17 +10,17 @@ exports.routes={
     	'/form':        {'form':'list'},
     	'/form/:id':    {'form':'get'}
     },
-    
+
     'POST':{
     	'/study': 		{'study':'create'},
     	'/form':        {'form':'create'}
     },
-    
+
     'PUT':{
     	'/study/:id': 	{'study':'update'},
     	'/form/:id':    {'form':'update'}
     },
-    
+
     'DELETE':{
     	'/study/:id': 	{'study':'remove'},
     	'/form/:id':    {'form':'remove'}
@@ -48,7 +49,7 @@ exports.db={
 		auto_reconnect:true
 	},
 	db_options:{
-		native_parser:true,
-		strict:true
-	},
+		native_parser:false,    //couldn't get the BSON C++ parser to work on OS X
+		strict:false            //false will prevent new collections from being autocreated
+	}
 }

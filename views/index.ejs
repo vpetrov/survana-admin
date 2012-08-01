@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
     <meta charset="utf-8">
     <title>{{= config.title }}</title>
@@ -18,15 +18,15 @@
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
     <![endif]-->
 
     <link href="{{=config.prefix}}css/main.css" rel="stylesheet">
-    <script src="js/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <!--<script src="js/lib/ace/ace.js" type="text/javascript" charset="utf-8"></script>-->
   </head>
 
   <body>
-      
+
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -71,7 +71,7 @@
     <div class="container">
         <!-- left menu -->
         <div class="row">
-        
+
             <!-- sidebar -->
             <div id='sidebar' class="span2">
                 <div class="sidebar-nav">
@@ -81,12 +81,12 @@
                         <li class="active"><a href="#create-form">Questionnaire</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="spacer">&nbsp;</div>
 
                 <div id='sidebar-form-groups' class="sidebar-nav"></div>
             </div>
-        
+
             <!-- main container -->
             <div class="span6">
                 <div class="container">
@@ -116,7 +116,7 @@
                               </div>
                             </div>
                           </fieldset>
-                          
+
                           <fieldset>
                           <legend>JSON: <small>// mustache syntax</small></legend>
                             <div id="code-editor-container">&nbsp;</div>
@@ -130,6 +130,155 @@
             </div>
         </div>
     </div>
+</script>
+
+<script id='tpl-form-view' type='text/template'>
+    <div class="container">
+        <!-- left menu -->
+        <div class="row">
+
+            <!-- sidebar -->
+            <div id='sidebar' class="span2">
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">Menu</li>
+                        <li class="active"><a href="#" onclick="return false">Details</a></li>
+                    </ul>
+                </div>
+
+                <div class="spacer">&nbsp;</div>
+
+
+                <div id='sidebar-form-versions' class="sidebar-nav"></div>
+            </div>
+
+            <!-- main container -->
+            <div class="span6">
+                <div class="container">
+                    <div class="row span6" id="messages"></div>
+                    <div class="row span6">
+                        <div class="page-header">
+                            <h1 style="display:inline"><%- title %>
+                                <small>
+                                    <% if (published) { %>
+                                    <span class="label label-success" rel="tooltip" title="This form has been published" style="font-size:larger">Published</span>
+                                    <% } else { %>
+                                    <span class="label" rel="tooltip" title="This study has not been published yet" style="font-size:larger">Draft</span>
+                                    <% } %>
+                                </small>
+                            </h1>
+                        </div>
+                        <div class="row">
+                            <div class="span1">Created on:</div>
+                            <div class="span5"><strong><%- (new Date()).toLocaleDateString() %></strong></div>
+                        </div>
+                        <div class="row">
+                            <div class="span1"><div style="margin-top:10px;">Version:</div></div>
+                            <div class="span5">
+                                <ul class="nav nav-pills">
+                                    <li class="dropdown">
+                                        <a class=" dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <span class="label label-warning"><%- version %></span>
+                                            <b class="caret"></b>
+                                        </a>
+                                        <ul class='form-versions'></ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <% if (data) { %>
+                        <h3>JSON: <small>// mustache syntax</small></h3>
+                        <div id="code-viewer-container">&nbsp;</div>
+                        <% } else { %>
+                        <h4><i class="icon-info-sign"></i> This questionnaire is empty.</h4>
+                        <% } %>
+                        <hr>
+                        <% if (!published) { %>
+                        <a id='btn-form-publish' class="btn btn-primary btn-medium" href="#">
+                            <i class="icon-globe icon-white"></i> Publish
+                        </a>
+                        <% } %>
+                        <a id='btn-form-edit' class="btn btn-warning btn-medium" href="#">
+                            <i class="icon-edit icon-white"></i> Edit
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script id='tpl-form-edit' type='text/template'>
+    <div class="container">
+        <!-- left menu -->
+        <div class="row">
+
+            <!-- sidebar -->
+            <div id='sidebar' class="span2">
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">Menu</li>
+                        <li class="active"><a href="#">Details</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- main container -->
+            <div class="span6">
+                <div class="container">
+                    <div class="row span6" id="messages"></div>
+                    <div class="row span6">
+                        <div class="page-header">
+                            <h1>Edit <%=title%>
+                                <small>// expert mode</small>
+                            </h1>
+                        </div>
+                        <form id='edit-form' class="form-vertical" onsubmit="return false">
+                            <fieldset>
+                                <div class="control-group">
+                                    <label class="control-label" for="form-title">Name</label>
+                                    <div class="controls">
+                                        <input type="text" class="span3" id="form-title" name="title" rel="tooltip"
+                                               title="Use one or two words" value="<%-title%>">
+                                    </div>
+                                    <label class="control-label" for="form-code">Code</label>
+                                    <div class="controls">
+                                        <input type="text" class="span1" id="form-code" name="code" rel="tooltip"
+                                               title="All response codes will have this prefix"
+                                               value="<%-code%>">
+                                        e.g. <code>DEM</code>, <code>EH</code>, <code>LIFE</code>
+                                    </div>
+                                    <label class="control-label" for="form-version">Version</label>
+                                    <div class="controls">
+                                        <input type="text" class="span1" id="form-version" name="version"
+                                               rel="tooltip" value="<%- version || '1.0' %>"
+                                               title="The version number is used to keep track of future changes to this questionnaire">
+                                        e.g. <code>0.1</code>, <code>first</code>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset>
+                                <legend>JSON: <small>// mustache syntax</small></legend>
+                                <div id="code-editor-container">&nbsp;</div>
+                            </fieldset>
+                            <hr>
+                            <button id='btn-form-edit-save' class="btn btn-success btn-medium" type='submit'>
+                                <i class="icon-ok-sign icon-white"></i>
+                                Save
+                            </button>
+                            <a id='btn-form-edit-cancel' class="btn btn-medium" href="#">
+                                <i class="icon-remove-circle"></i>
+                                Cancel
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </script>
 
@@ -137,7 +286,7 @@
     <div class="container">
         <!-- left menu -->
         <div class="row">
-        
+
             <!-- sidebar -->
             <div id='sidebar' class="span2">
                 <div class="sidebar-nav">
@@ -147,13 +296,13 @@
                         <li><a href="#form/create">Questionnaire</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="spacer">&nbsp;</div>
 
-                
+
                 <div id='sidebar-form-groups' class="sidebar-nav"></div>
             </div>
-        
+
             <!-- main container -->
             <div class="span6">
                 <div class="container">
@@ -173,12 +322,12 @@
                               </div>
                             </div>
                           </fieldset>
-                          
+
                           <fieldset>
-                          <legend>Forms <small>// drag and drop here:</small></legend>
-                              <div id='study-forms-container' class="span6 build-pad-mv" style="margin-left:0px"></div>
+                            <legend>Forms <small>// drag and drop here:</small></legend>
+                            <div id='study-forms-container' class="span6 build-pad-mv" style="margin-left:0px"></div>
                           </fieldset>
-                          
+
                           <input type="submit">
                         </form>
                     </div>
@@ -192,7 +341,7 @@
     <div class="container">
         <!-- left menu -->
         <div class="row">
-        
+
             <!-- sidebar -->
             <div id='sidebar' class="span2">
                 <div class="sidebar-nav">
@@ -207,10 +356,10 @@
 
                 <div class="spacer">&nbsp;</div>
 
-                
+
                 <div id='sidebar-form-groups' class="sidebar-nav"></div>
             </div>
-            
+
             <!-- main container -->
             <div class="span6">
                 <div class="container">
@@ -228,12 +377,12 @@
                                 </small>
                             </h1>
                         </div>
-                        <div class="well">                            
+                        <div class="well">
                             <div class="row">
                                 <div class="span1">ID:</div>
                                 <div class="span3"><strong><%- id %></strong></div>
                             </div>
-                            
+
                             <% if (published) {%>
                                 <div class="row">
                                     <div class="span1">URL:</div>
@@ -247,16 +396,19 @@
                         <ol>
                             <% for(var i=0;i<forms.length;++i) { %>
                                 <li>
-                                        <strong><%- forms[i].title %></strong>
+                                        <strong><a href="#form/<%-forms[i].id%>"><%- forms[i].title %></a></strong>
                                             <code><%- forms[i].version %></code>
 
                                 </li>
                             <% } %>
                         </ol>
                         <hr>
-                        
+
                         <% if (!published) { %>
-                            <a id='btn-study-publish' class="btn btn-primary btn-medium" href="#">Publish</a>
+                            <a id='btn-study-publish' class="btn btn-primary btn-medium" href="#">
+                                <i class="icon-globe icon-white"></i>
+                                Publish
+                            </a>
                         <% } %>
                     </div>
                 </div>
@@ -286,7 +438,7 @@
     <tr>
         <td>
             <a href="#study/<%- obj.id %>">
-                <%- title %></td>
+                <%- title %>
             </a>
         <td>
             <% if (published) { %>
@@ -296,7 +448,7 @@
             <% } %>
         </td>
         <td>
-            <% var d=new Date(created_on); %> 
+            <% var d=new Date(created_on); %>
             <%- d.toLocaleDateString() %>
         </td>
     </tr>
@@ -307,7 +459,7 @@
         <ul id='form-list' class="nav nav-list">
             <li class="nav-header">Forms</li>
             <%  _.each(items,function(item){ %>
-                <%= itemTemplate(_.last(item)) %> 
+                <%= itemTemplate(_.last(item)) %>
             <% }); %>
         </ul>
 </script>
@@ -341,13 +493,14 @@
     </a>
 </script>
 
-<script id="tpl-study-forms-menu" type="text/template">
+<script id="tpl-form-version-menu" type="text/template">
     <ul class="dropdown-menu">
-        <li><span style="border-top:1px solid lightgray;display:block"></span></li>
+        <!-- break -->
+        <!-- <li><span style="border-top:1px solid lightgray;display:block"></span></li> -->
         <% for (var i=0; i<group.length;++i) { %>
         <li>
             <a href="#" data-form-id='<%- group[i].id %>'>
-                <%- group[i].title %> 
+                <%- group[i].title %>
                 <span class="label label-warning"><%- group[i].version %></span>
             </a>
         </li>
@@ -362,7 +515,6 @@
     </div>
 </script>
 
-<?php //message is unescaped ?>
 <script id='tpl-modal-alert' type="text/template">
     <div class="modal hide">
       <div class="modal-header">
@@ -404,5 +556,9 @@
         }
     });
 </script>
+
+  <div style="margin-top:100px;height:50px">
+ &nbsp;
+  </div>
 </body>
 </html>

@@ -1,12 +1,10 @@
 var path=require('path');
 var step=require('step');
 
-var forms=require('./store/forms.json'); //TODO: remove me
-
 function requirejs_libs(config)
 {
 	var result={};
-	
+
 	for (l in config.lib)
 		result[l]=path.join(config.lib[l],l);
 
@@ -14,32 +12,71 @@ function requirejs_libs(config)
 }
 
 exports.index=function(req,res)
-{	
+{
 	var len=req.originalUrl.length;
-	
+    var studies=[];
+    var forms=require('./store/forms.json'); //TODO: remove me
+
 	//make sure the browser is using a trailing slash
 	if (req.originalUrl[len-1]!=='/')
 		return res.redirect(req.originalUrl+'/');
-	
+
 	step(
 		//get the 'study' collection
-		function getCollection(){
+		function getCollection()
+        {
 			req.app.db.collection('study',this)
 		},
-		
+
 		//find all study documents, prevent _id from showing up
-		function findAllStudies(err,col){
+		function findAllStudies(err,col)
+        {
 			if (err)
 				throw err;
-			
+
 			col.find({},{'_id':0}).toArray(this);
 		},
-		
-		//render the page
-		function displayPage(err,studies)
+
+		//store the dataset for later
+		function studyResults(err,result)
 		{
-			if (err)
-				throw err;
+			if (err) throw err;
+
+            studies=result;
+
+            return studies;
+        },
+
+        //get the 'form' collection
+        function getFormCollection(err)
+        {
+            if (err) throw err;
+
+            req.app.db.collection('form',this)
+        },
+
+        //find all form documents, prevent '_id' from showing up
+        function getForms(err,col)
+        {
+            if (err) throw err;
+
+            col.find({},{'_id':0}).toArray(this);
+        },
+
+        //store the dataset for later
+        function formResults(err,result)
+        {
+            if (err) throw err;
+
+            forms=forms.concat(result);
+
+            return forms;
+        },
+
+        //render the index page with the form and study datasets
+        function dislayPage(err)
+        {
+            if (err) throw err;
 
 			res.render('index',{
 				config:req.app.config,

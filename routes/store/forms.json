@@ -1,14 +1,5 @@
 [
    {
-      "id":"Subj1",
-      "gid":0,
-      "code":"SUBJ",
-      "group":"Subject ID",
-      "title":"Subject ID",
-      "version":"1.0",
-      "created_on":23910209322
-   },
-   {
       "id":"EHzg213",
       "gid":1,
       "code":"EH",

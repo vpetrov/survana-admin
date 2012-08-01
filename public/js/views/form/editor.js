@@ -2,26 +2,44 @@ define(
 		[
 			'jquery',
 			'underscore',
-			'backbone'
+			'backbone',
+            'ace/ace'
 		],
-function ($,_,Backbone)
+function ($,_,Backbone,Ace)
 {
 	return Backbone.View.extend({
-		
+
+        editor:null,
+        text:null,
+
 		initialize:function(options)
 		{
-			console.log('Initializing Editor View');
+            if (options && options.text)
+                this.text=options.text;
+
+			console.log('Initializing Editor View',options);
 			_.bindAll(this,'render');
 		},
-		
+
 		render:function()
 		{
 			this.$el.addClass('code-editor');
-			console.log('code editor element',this.$el);
-			var editor=ace.edit($(this.el).get(0));
-    	    //editor.setTheme("ace/theme/twilight");
-    		editor.getSession().setMode("ace/mode/json");
+			this.editor=Ace.edit($(this.el).get(0));
+    	    this.editor.setTheme("ace/theme/textmate");
+    		this.editor.getSession().setMode("ace/mode/json");
+            if (this.text)
+                this.editor.getSession().setValue(this.text);
 			return this;
-		}
+		},
+
+        getEditor:function()
+        {
+            return this.editor;
+        },
+
+        getText:function()
+        {
+            return this.editor.getSession().getDocument().getValue();
+        }
 	});
 });
