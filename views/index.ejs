@@ -546,7 +546,7 @@
         //url to all javascript files
         baseUrl:    "{{= config.prefix }}js",
         //print all the dependencies, in a way that requirejs can reach them
-        paths:  {{- JSON.stringify(require_libs) }},
+        paths:  {{- JSON.stringify(config.to_requirejs()) }},
         //specify that backbone depends on jquery and returns a global 'Backbone' object
         shim:{
             'backbone':{

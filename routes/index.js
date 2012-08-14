@@ -1,16 +1,6 @@
 var path=require('path');
 var step=require('step');
 
-function requirejs_libs(config)
-{
-	var result={};
-
-	for (l in config.lib)
-		result[l]=path.join(config.lib[l],l);
-
-	return result;
-}
-
 exports.index=function(req,res)
 {
 	var len=req.originalUrl.length;
@@ -80,7 +70,6 @@ exports.index=function(req,res)
 
 			res.render('index',{
 				config:req.app.config,
-				require_libs:requirejs_libs(req.app.config),
 				forms:forms,
 				studies:studies
 			});
