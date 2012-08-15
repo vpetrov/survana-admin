@@ -5,7 +5,7 @@ exports.index=function(req,res)
 {
 	var len=req.originalUrl.length;
     var studies=[];
-    var forms=require('./store/forms.json'); //TODO: remove me
+    var forms=[];
 
 	//make sure the browser is using a trailing slash
 	if (req.originalUrl[len-1]!=='/')
