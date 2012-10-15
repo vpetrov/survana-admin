@@ -9,6 +9,10 @@ var study_blacklist={
     'keys':0
 };
 
+var form_blacklist={
+    '_id':0
+};
+
 function getPublisher(config,p)
 {
     if (config.publishers.hasOwnProperty(p))
@@ -57,30 +61,27 @@ exports.create=function(req,res,next)
         return next(Error('Invalid request'));
 
 	async.waterfall([
-		function getCollection(next){
-			db.collection('study',next);
+		function getCollection(next2){
+			db.collection('study',next2);
 		},
 
-		function generateUniqueId(collection,next){
+		function generateUniqueId(collection,next2){
 			col=collection;
-			db.uniqueId(collection,'id',next);
+			db.uniqueId(collection,'id',next2);
 		},
 
-		function addStudy(uniqueId,next){
+		function addStudy(uniqueId,next2){
 			study['id']=uniqueId;
 			study['created_on']=(new Date()).valueOf();
             study['keys']=exports.genkeys(study,config.encryption);
 
-			col.insert(study,{safe:true,fsync:true},next);
+			col.insert(study,{safe:true,fsync:true},next2);
 		},
 
-        function prepareResult(ok,result,next)
+        function prepareResult(result,next2)
         {
-            if (!ok)
-                next(result.err);
-
             //always return what is actually stored in the DB, not what we think was stored.
-            col.findOne({'id':study.id},study_blacklist,next);
+            col.findOne({'id':study.id},study_blacklist,next2);
         }
     ],
 
@@ -132,24 +133,89 @@ exports.update=function(req,res,next)
             //check to see if the client added any new publishers
             var publish_servers=arrays.diff(study.publishers,item.publishers);
 
-            //publish the study on the new servers, if necessary
-            if (publish_servers && publish_servers.length)
-            {
-                var servers=[];
-                //build a list of publish servers
-                for (var i in publish_servers)
-                {
-                    var server=config.publishers[publish_servers[i]];
-                    server['name']=publish_servers[i];
-                    servers.push(server);
-                }
 
-                study.publishers=item.publishers; //only the successful publishers will be added back to this list
-                module.exports.publish(item,servers,req.app.privateKey,next);
+            //skip to the next step if no publishing is necessary
+            if (!publish_servers || !publish_servers.length)
+                return next(null,null);
+
+
+            //publish the study on the new servers, if necessary
+            var servers=[];
+            //build a list of publish servers
+            for (var i in publish_servers)
+            {
+                var server=config.publishers[publish_servers[i]];
+                server['name']=publish_servers[i];
+                servers.push(server);
             }
-            else
-                //simply update the study
-                next(null,null);
+
+            study.publishers=item.publishers; //only the successful publishers will be added back to this list
+
+            //replace all form ids with copies of the actual form data and then publish
+            //first, obtain the forms from the database
+            async.waterfall([
+                function getCollection(next2)
+                {
+                    db.collection('form',next2);
+                },
+
+                function getAllFormsInStudy(col,next2)
+                {
+                    col.find({
+                        'id':{
+                            '$in':item.forms
+                        }
+                    },form_blacklist).toArray(next2);
+                },
+
+                function replaceCurrentForms(forms,next2)
+                {
+                    if (!forms || !forms.length)
+                        next2(Error('Failed to get list of forms from the database.'));
+
+                    //have all the forms been found in the database?
+                    if (forms.length!=item.forms.length)
+                    {
+                        //oops. some forms are missing. get their IDs then.
+
+                        //first,build an array of IDs that were found
+                        var found=[];
+                        for (var i in forms)
+                            found.push(forms[i].id);
+
+                        var not_found=arrays.diff(item.forms,found);
+
+                        return next2(Error('The following forms could not be found: '+not_found.join(',')));
+                    }
+
+                    //todo: make sure that all forms were published before publishing the study
+
+                    var full_study=item;
+
+                    //add all the forms in the correct order (since the array returned by mongodb might not match the
+                    // order in which the user has arranged the forms)
+                    for (var i in forms)
+                    {
+                        var form=forms[i];
+
+                        var index=full_study.forms.indexOf(form.id);
+                        full_study.forms[index]=form;
+                    }
+
+                    next2(null,full_study)
+                }
+            ],
+            function processResult(err,full_study)
+            {
+                if (err)
+                    return next(err);
+
+                //make sure the internal mongodb ID is not published
+                delete full_study['_id'];
+
+                //publish the study (and then proceed to the next step)
+                module.exports.publish(full_study,servers,req.app.privateKey,next);
+            });
 		},
 
         function updateStudy(results,next)

@@ -43,17 +43,7 @@ exports.server=function(survana,express)
 		throw error;
 	});
 
-    //load all keys
-    for (var i in this.config.publishers)
-    {
-        var keypath=this.config.publishers[i].key;
-
-        if (!fs.existsSync(keypath))
-            throw Error("Publisher '"+i+"': no public key found at '"+keypath+"'");
-
-        //read the key and store it instead of the 'key' property
-        this.config.publishers[i].key=fs.readFileSync(keypath);
-    }
+    this.config.publishers=survana.readKeys(this.config.publishers);
 
 	return this.app;
 }

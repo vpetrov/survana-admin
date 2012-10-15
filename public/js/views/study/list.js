@@ -9,9 +9,9 @@ function($,_,Backbone)
     	template:_.template($('#tpl-study-list').html()),
     	itemTemplate:_.template($('#tpl-study-list-item').html()),
 
-    	initialize:function(options){	
+    	initialize:function(options){
     		_.bindAll(this,'render','onStudyAdded');
-    		
+
 			this.collection.on("change reset",this.render);
 			this.collection.on("add",this.onStudyAdded)
     	},
@@ -26,14 +26,16 @@ function($,_,Backbone)
     			'items':this.collection.toJSON(),
     			'itemTemplate':this.itemTemplate
     		}));
-	        
+
     		return this;
 	    },
 
 	    onStudyAdded:function(newitem,model)
 	    {
-	    	this.$el.find('tbody').append(this.itemTemplate(newitem.toJSON()));
+	    	this.$el.find('tbody').append(this.itemTemplate({
+                'study':newitem
+            }));
 	    }
    });
-    
+
 }); //define

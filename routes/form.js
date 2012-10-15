@@ -10,7 +10,7 @@ exports.get=function(req,res)
 	res.send('Form::get');
 }
 
-exports.create=function(req,res)
+exports.create=function(req,res,next)
 {
 	var db=req.app.db;
 	var col=null;
@@ -24,82 +24,72 @@ exports.create=function(req,res)
 
 	console.log('form create',gid);
 
-	step(
-		function getCollection(){
-			db.collection('form',this);
-			console.log(arguments.callee);
+	async.waterfall([
+
+		function getCollection(next2){
+			db.collection('form',next2);
 		},
-		function generateUniqueId(err,collection){
-			if (err) throw err;
+		function generateUniqueId(collection,next2){
 			col=collection;
-			db.uniqueId(collection,'id',this);
-			console.log(arguments.callee);
+			db.uniqueId(collection,'id',next2);
 		},
 
-		function setId(err,uniqueId){
-			if (err) throw err;
-
+		function setId(uniqueId,next2){
 			form['id']=uniqueId;
 			form['created_on']=(new Date()).valueOf();
-			console.log(arguments.callee);
 
-			return form;
+			next2(null,form);
 		},
 
 		//S1 and S2 are mutually exclusive. 'gid' is used as guard.
-		function S1_generateGroupId(err){
-			if (err) throw err;		//handle errors
-			if (gid!='0') return null;  //does the form have a group already?
+		function S1_generateGroupId(form,next2){
+			if (gid!='0')
+                return next2(null,form);  //does the form have a group already?
 
-			db.uniqueId(col,'id',this);
-			console.log(arguments.callee);
+			db.uniqueId(col,'id',next2);
 		},
 
-		function S1_setGroup(err,uniqueId){
-			if (err) throw err;
-			if (gid!='0') return null;
+		function S1_setGroup(uniqueId,next2){
+			if (gid!='0')
+                return next2(null,form);
 
 			form['gid']=uniqueId;
 			form['group']=form['title'];
-			console.log(arguments.callee);
-			return form;
+
+            next2(null,form);
 		},
 
-		function S2_findGroup(err){
-			if (err) throw err;
-			if (gid=='0') return null;
+		function S2_findGroup(form,next2){
+			if (gid=='0')
+                return next2(null,form);
 
-			col.findOne({'gid':gid},this);
-			console.log(arguments.callee);
+			col.findOne({'gid':gid},next2);
 		},
 
-		function S2_updateGroup(err,result){
-			if (err) throw err;
-			if (gid=='0') return null;
+		function S2_updateGroup(result,next2){
+			if (gid=='0')
+                return next2(null,form);
 
 			if (!result)
-				throw Error('Group id '+gid+' not found.');
+				return next2(Error('Group id '+gid+' not found.'));
 
 			form['group']=result['group'];
-			console.log(arguments.callee);
-			return form;
+
+			next2(null,form);
 		},
 
-		function addForm(err){
-			if (err) throw err;
-
-			col.insert(form,{safe:true,fsync:true},this);
-			console.log(arguments.callee);
-		},
-
-		function processResult(err,result) {
-			if (err) throw err; //TODO: can't let DB errors get to the client
-
-			delete form['_id']; //remove internal ID
-			res.send(form);
-			console.log(arguments.callee);
+		function addForm(form,next2){
+			col.insert(form,{safe:true,fsync:true},next2);
 		}
-	);
+    ],
+
+    function processResult(err,result) {
+        if (err)
+            return next(err);
+
+        delete form['_id']; //remove internal ID
+        res.send(form);
+    });
 }
 
 /** UPDATE

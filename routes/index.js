@@ -1,7 +1,16 @@
 var path=require('path');
-var step=require('step');
+var async=require('async');
 
-exports.index=function(req,res)
+var study_blacklist={
+    '_id':0,
+    'keys':0
+};
+
+var form_blacklist={
+    '_id':0
+};
+
+exports.index=function(req,res,next)
 {
 	var len=req.originalUrl.length;
     var studies=[];
@@ -11,74 +20,57 @@ exports.index=function(req,res)
 	if (req.originalUrl[len-1]!=='/')
 		return res.redirect(req.originalUrl+'/');
 
-	step(
+	async.waterfall([
 		//get the 'study' collection
-		function getCollection()
+		function getCollection(next2)
         {
-			req.app.db.collection('study',this)
+			req.app.db.collection('study',next2)
 		},
 
 		//find all study documents, prevent _id from showing up
-		function findAllStudies(err,col)
+		function findAllStudies(col,next2)
         {
-			if (err)
-				throw err;
-
-			col.find({},{'_id':0}).toArray(this);
+			col.find({},study_blacklist).toArray(next2);
 		},
 
-		//store the dataset for later
-		function studyResults(err,result)
-		{
-			if (err) throw err;
-
-            studies=result;
-
-            return studies;
-        },
-
         //get the 'form' collection
-        function getFormCollection(err)
+        function getFormCollection(result,next2)
         {
-            if (err) throw err;
-
-            req.app.db.collection('form',this)
+            studies=result;
+            req.app.db.collection('form',next2)
         },
 
         //find all form documents, prevent '_id' from showing up
-        function getForms(err,col)
+        function getForms(col,next2)
         {
-            if (err) throw err;
-
-            col.find({},{'_id':0}).toArray(this);
+            col.find({},form_blacklist).toArray(next2);
         },
 
         //store the dataset for later
-        function formResults(err,result)
+        function formResults(result,next2)
         {
-            if (err) throw err;
-
             forms=forms.concat(result);
 
-            return forms;
-        },
+            next2(null,studies,forms);
+        }
+    ],
 
-        //render the index page with the form and study datasets
-        function dislayPage(err)
-        {
-            if (err) throw err;
+    //render the index page with the form and study datasets
+    function dislayPage(err,studies,forms)
+    {
+        if (err)
+            return next(err);
 
-            var server_names=[];
+        var server_names=[];
 
-            for (var i in req.app.config.publishers)
-                server_names.push(i);
+        for (var i in req.app.config.publishers)
+            server_names.push(i);
 
-			res.render('index',{
-				config:req.app.config,
-				forms:forms,
-				studies:studies,
-                publishers:server_names
-			});
-		}
-	);
+        res.render('index',{
+            config:req.app.config,
+            forms:forms,
+            studies:studies,
+            publishers:server_names
+        });
+    });
 }
