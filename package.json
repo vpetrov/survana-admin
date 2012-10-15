@@ -1,6 +1,6 @@
 {
 	"name":		"survana-admin",
-	"version":	"0.0.1c",
+	"version":	"0.0.1d",
 	"author":	"Victor Petrov <victor_petrov@harvard.edu>",
 	"description":"Survana administration module",
 	"repository":{
@@ -10,6 +10,10 @@
 	"keywords":["survana","questionnaire","form","mobile","admin"],
 	"license":"New BSD",
     "dependencies":{
-        "step":		">= 0.0.5"
+        "async":    "0.1.x",
+        "ursa":     "0.7.x",
+        "vows":     "0.6.x",
+        "request":  "2.x.x"
+
     }
 }

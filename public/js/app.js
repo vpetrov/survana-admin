@@ -6,19 +6,21 @@ define([
 			'routes'
 		],
 function($,Backbone,FormList,StudyList,Routes)
-{		 
+{
 		var store={};
-	    
+
 	    //Init all models
 	    store.forms=new FormList();
-	    store.studies=new StudyList(); //TODO: pass studies to HomeView
-	    
-	    //init models
+	    store.studies=new StudyList();
+        store.publishers=$.parseJSON($('#store-publishers').html());
+
+	    //reset models
 	    store.forms.reset($.parseJSON($('#store-forms').html()));
 	    store.studies.reset($.parseJSON($('#store-studies').html()));
-	    
+
+    console.log('store publishers',store.publishers);
 	    Routes.store=store;
-	    
+
 	    Backbone.View.prototype.router=Routes;
 
 	    Backbone.history.start();

@@ -68,10 +68,16 @@ exports.index=function(req,res)
         {
             if (err) throw err;
 
+            var server_names=[];
+
+            for (var i in req.app.config.publishers)
+                server_names.push(i);
+
 			res.render('index',{
 				config:req.app.config,
 				forms:forms,
-				studies:studies
+				studies:studies,
+                publishers:server_names
 			});
 		}
 	);

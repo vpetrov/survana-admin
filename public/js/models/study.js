@@ -10,7 +10,8 @@ function(Backbone)
     		return {
     			created_on:0,
     			title:"",
-    			published:false,
+                publishers:[],
+                urls:{},
                 install:true,
     			forms:[]
     		}
@@ -21,7 +22,8 @@ function(Backbone)
                 this.set({
                 	'created_on':this.defaults.created_on,
                 	'title':this.defaults.title,
-                	'published':this.defaults.published,
+                    'publishers':this.defaults.publishers,
+                    'urls':{},
                     'install':true,
                 	'forms':this.defaults.forms
                 });

@@ -9,19 +9,22 @@ function($,_,Backbone,Alert)
     return Backbone.View.extend({
     	template:_.template($('#tpl-study-view').html()),
     	forms:[],
+        publishers:[],
 
     	initialize:function(options)
     	{
-    		_.bindAll(this,'render','publish','onPublishClick');
+    		_.bindAll(this,'render','publish','onPublishClick','disablePublishButton');
 
     		if (!this.model)
-    			return Alert.modal('This study does not exist.');
+    			return Alert.modal('This study does not exist.'); //TODO: fetch study from the server (back button issue)
+
+            this.publishers=options.publishers;
 
             this.forms=[];
 
     		//find all form models by the ID specified in the Study (convert model to json)
 			_.each(this.model.get('forms'),function(form_id){
-				var f=this.collection.get(form_id); //TODO: used to be App.forms.get
+				var f=this.collection.get(form_id);
 
 				if (f)
                 {
@@ -34,7 +37,7 @@ function($,_,Backbone,Alert)
     	},
 
     	events:{
-    		'click #btn-study-publish': 'onPublishClick'
+    		'click .btn-study-publish': 'onPublishClick'
     	},
 
     	render:function()
@@ -44,32 +47,83 @@ function($,_,Backbone,Alert)
 
     		model['forms']=this.forms;
 
-			$(this.el).html(this.template(model));
+			$(this.el).html(this.template({
+                'study':model,
+                'publishers':this.publishers
+            }));
 			return this;
     	},
 
-    	publish:function()
+        enablePublishButton:function(enable)
+        {
+            if (enable==undefined || enable)
+                this.$el.find('button.btn-study-publish,button.dropdown-toggle').button('reset');
+            else
+            {
+                this.$el.find('button.btn-study-publish').button('loading');
+                this.$el.find('button.dropdown-toggle').attr('disabled','disabled');
+            }
+        },
+
+    	publish:function(server)
     	{
-    		if (this.model.get('publish'))
-    			return;
+            var view=this;
+            var publishers=this.model.get('publishers');
+
+            //for some reason, we're trying to publish an already published study
+            if (publishers.indexOf(server)>-1)
+                return;
+
+            //user wants to publish to all servers
+            if (!server)
+                publishers=this.publishers;
+            else
+                //add server to current list of publishers
+                publishers.push(server);
 
     		this.model.save({
-    				'published':true
-    			},
+                    publishers:publishers
+                },
     			{
     				'wait':true,
     				'success':function(){
-    					console.log('success');
+                        //reset the button
+                        view.enablePublishButton();
     				},
     				'error':function(model,result,caller){
-    					console.log('no success',model,result,caller);
+                        var message="Publish error: ";
+                        try
+                        {
+                            var response=JSON.parse(result.responseText);
+
+                            if (response['message'])
+                                message+=response.message;
+                        }
+                        catch (e)
+                        {
+                            console.log('exception',e,'responseText',result.responseText);
+
+                            //todo: not sure what to do when the response is not valid JSON.
+                            if (result.responseText && result.responseText.length)
+                                message+=responseText;
+                            else
+                                message+="The server has encountered an internal error."; //uncaught exception. oops.
+                        }
+
+                        //remove the publisher since the request failed (doesn't trigger a 'change' event)
+                        model.set({'publishers':_.without(model.get('publishers'),server)},{'silent':true});
+
+                        view.enablePublishButton();
+
+    					Alert.modal(message);
     				}
     			});
     	},
 
     	onPublishClick:function(e)
     	{
-    		this.publish();
+            this.enablePublishButton(false);
+    		this.publish($(e.currentTarget).attr('data-publisher'));
 
     		e.preventDefault();
     		return false;

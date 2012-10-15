@@ -1,6 +1,14 @@
 exports.title='Survana Administration';
-//exports.study_url_prefix='http://vpetrov.neuroinfo.org/';
-exports.study_url_prefix="http://localhost:8000/";
+
+//the first server listed is the default publishing server
+exports.publishers={
+};
+
+//the more keys there are to generate, the slower Survana will be at creating surveys and importing responses.
+exports.encryption={
+    'keys':10,
+    'bits':1024
+}
 
 exports.routes={
     'GET':{
@@ -29,7 +37,7 @@ exports.routes={
 
 exports.lib={
 	'backbone':'lib/backbone/0.9.2',
-	'bootstrap':'lib/bootstrap/2.0.4',
+	'bootstrap':'lib/bootstrap/2.1.1',
 	'jquery':'lib/jquery/1.7.2',
 	'jquery-ui':'lib/jquery/ui/1.8.21',
 	'require':'lib/require/2.0.4',

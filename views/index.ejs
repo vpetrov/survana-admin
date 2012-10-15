@@ -27,7 +27,7 @@
 
   <body>
 
-    <div class="navbar navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -133,6 +133,7 @@
 </script>
 
 <script id='tpl-form-view' type='text/template'>
+    <% console.log(arguments); %>
     <div class="container">
         <!-- left menu -->
         <div class="row">
@@ -163,13 +164,13 @@
                                     <% if (published) { %>
                                     <span class="label label-success" rel="tooltip" title="This form has been published" style="font-size:larger">Published</span>
                                     <% } else { %>
-                                    <span class="label" rel="tooltip" title="This study has not been published yet" style="font-size:larger">Draft</span>
+                                    <span class="label" rel="tooltip" title="This form has not been published yet" style="font-size:larger">Draft</span>
                                     <% } %>
                                 </small>
                             </h1>
                         </div>
                         <div class="row">
-                            <div class="span1">Created on:</div>
+                            <div class="span1">Created:</div>
                             <div class="span5"><strong><%- (new Date()).toLocaleDateString() %></strong></div>
                         </div>
                         <div class="row">
@@ -188,20 +189,24 @@
                         </div>
 
                         <% if (data) { %>
-                        <h3>JSON: <small>// mustache syntax</small></h3>
-                        <div id="code-viewer-container">&nbsp;</div>
+                            <div class="row">
+                                <div class="span2 muted"></div>
+                                <div class="span4" style="text-align:right">
+                                    <% if (!published) { %>
+                                    <a id='btn-form-publish' class="btn btn-primary btn-medium" href="#">
+                                        <i class="icon-globe icon-white"></i> Publish
+                                    </a>
+                                    <% } %>
+                                    <a id='btn-form-edit' class="btn btn-warning btn-medium" href="#">
+                                        <i class="icon-edit icon-white"></i> Edit
+                                    </a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div id="code-viewer-container">&nbsp;</div>
                         <% } else { %>
-                        <h4><i class="icon-info-sign"></i> This questionnaire is empty.</h4>
+                            <h4><i class="icon-info-sign"></i> This questionnaire is empty.</h4>
                         <% } %>
-                        <hr>
-                        <% if (!published) { %>
-                        <a id='btn-form-publish' class="btn btn-primary btn-medium" href="#">
-                            <i class="icon-globe icon-white"></i> Publish
-                        </a>
-                        <% } %>
-                        <a id='btn-form-edit' class="btn btn-warning btn-medium" href="#">
-                            <i class="icon-edit icon-white"></i> Edit
-                        </a>
                     </div>
                 </div>
             </div>
@@ -348,7 +353,7 @@
                     <ul class="nav nav-list">
                         <li class="nav-header">Menu</li>
                         <li class="active"><a href="#" onclick="return false">Details</a></li>
-                        <% if (published) { %>
+                        <% if (study.published) { %>
                             <li><a href="#" onclick="return false">Responses</a></li>
                         <% } %>
                     </ul>
@@ -366,9 +371,9 @@
                     <div class="row span6" id="messages"></div>
                     <div class="row span6">
                         <div class="page-header">
-                            <h1><%- title %>
+                            <h1><%- study.title %>
                                 <small>
-                                <% if (published) { %>
+                                <% if (study.publishers.length) { %>
                                     <span class="label label-success" rel="tooltip" title="This study has been published" style="font-size:larger">Published</span>
                                 <% } else { %>
                                     <span class="label" rel="tooltip" title="This study has not been published yet" style="font-size:larger">Draft</span>
@@ -380,35 +385,60 @@
                         <div class="well">
                             <div class="row">
                                 <div class="span1">ID:</div>
-                                <div class="span3"><strong><%- id %></strong></div>
+                                <div class="span3"><strong><%- study.id %></strong></div>
                             </div>
 
-                            <% if (published) {%>
+                            <% for (var i in study.publishers) {%>
+                                <% var server=study.publishers[i], url=study.urls[server]; %>
                                 <div class="row">
-                                    <div class="span1">URL:</div>
-                                    <% var study_url="{{= config.study_url_prefix }}"+id %>
-                                    <div class="span3"><a href='<%- study_url %>'><%- study_url %></a></div>
+                                    <div class="span1"><%= server %>:</div>
+                                    <div class="span3"><a href='<%- url %>'><%- url %></a></div>
                                 </div>
                             <% } %>
                         </div>
                         <h4>Forms:</h4>
                         <br>
                         <ol>
-                            <% for(var i=0;i<forms.length;++i) { %>
+                            <% for(var i=0;i<study.forms.length;++i) { %>
                                 <li>
-                                        <strong><a href="#form/<%-forms[i].id%>"><%- forms[i].title %></a></strong>
-                                            <code><%- forms[i].version %></code>
+                                        <strong><a href="#form/<%-study.forms[i].id%>"><%- study.forms[i].title %></a></strong>
+                                            <code><%- study.forms[i].version %></code>
 
                                 </li>
                             <% } %>
                         </ol>
                         <hr>
 
-                        <% if (!published) { %>
-                            <a id='btn-study-publish' class="btn btn-primary btn-medium" href="#">
-                                <i class="icon-globe icon-white"></i>
-                                Publish
-                            </a>
+                        <% var servers=_.difference(publishers,study.publishers); %>
+
+                        <% if (servers.length) { %>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-medium btn-study-publish"
+                                        data-publisher="<%= servers[0] %>" data-loading-text="Publishing...">
+                                    <i class="icon-globe icon-white"></i>
+                                    Publish
+                                </button>
+                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <% for (var i=0;i<servers.length;++i) { %>
+                                        <li>
+                                            <a class="btn-study-publish" href="#" data-publisher="<%= servers[i] %>">
+                                                <% if (i) { %>
+                                                    <%= servers[i] %>
+                                                <% } else { %>
+                                                    <strong><%= servers[i] %></strong> (default)
+                                                <% } %>
+                                            </a>
+                                        </li>
+                                    <% } %>
+                                    <% if (servers.length>1) { %>
+                                        <li class="divider"></li>
+                                        <li><a class="btn-study-publish" href="#">All</a></li>
+                                    <% } %>
+                                </ul>
+                            </div>
                         <% } %>
                     </div>
                 </div>
@@ -428,7 +458,7 @@
         </thead>
         <tbody>
             <% _.each(items,function(item){ %>
-                <%= itemTemplate(item) %>
+                <%= itemTemplate({'study':item}) %>
             <% }); %>
         </tbody>
     </table>
@@ -437,18 +467,18 @@
 <script id="tpl-study-list-item" type="text/template">
     <tr>
         <td>
-            <a href="#study/<%- obj.id %>">
-                <%- title %>
+            <a href="#study/<%- study.id %>">
+                <%- study.title %>
             </a>
         <td>
-            <% if (published) { %>
+            <% if (study.publishers.length) { %>
                 <span class="label label-success" rel="tooltip" title="This study has been published" >Published</span>
             <% } else { %>
                 <span class="label" rel="tooltip" title="This study has not been published yet">Draft</span>
             <% } %>
         </td>
         <td>
-            <% var d=new Date(created_on); %>
+            <% var d=new Date(study.created_on); %>
             <%- d.toLocaleDateString() %>
         </td>
     </tr>
@@ -508,6 +538,18 @@
     </ul>
 </script>
 
+<script id="tpl-publishers-menu" type="text/template">
+    <ul class="dropdown-menu">
+        <% for (var i=0; i<group.length;++i) { %>
+        <li>
+            <a href="#">
+                <%- group[i].name %>
+            </a>
+        </li>
+        <% } %>
+    </ul>
+</script>
+
 <script id="tpl-alert" type="text/template">
     <div class="alert">
         <button class="close" data-dismiss="alert">×</button>
@@ -536,6 +578,10 @@
 
 <script id="store-studies" type="text/store">
     {{- JSON.stringify(studies) }}
+</script>
+
+<script id="store-publishers" type="text/store">
+    {{- JSON.stringify(publishers) }}
 </script>
 
 

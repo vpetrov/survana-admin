@@ -1,4 +1,4 @@
-var step=require('step');
+var async=require('async');
 
 exports.list=function(req,res)
 {
@@ -107,30 +107,26 @@ exports.create=function(req,res)
 exports.update=function(req,res)
 {
     var db=req.app.db;
-    var col=null;
     var form=req.body;
     var form_id=req.params.id;
+    var col=null;
 
     if (typeof(form)!=='object')
         throw 'Invalid request';
 
     //TODO: validate input data (malicious js functions?)
 
-    step(
-        function getCollection(){
-            db.collection('form',this);
+    async.waterfall([
+        function getCollection(next){
+            db.collection('form',next);
         },
 
-        function getExistingForm(err,collection){
-            if (err) throw err;
-
+        function getExistingForm(collection,next){
             col=collection;
-            col.findOne({'id':form_id},this);
+            col.findOne({'id':form_id},next);
         },
 
-        function updateForm(err,item){
-            if (err) throw err;
-
+        function updateForm(item,next){
             if (!item)
                 return res.send('Form not found',404);
 
@@ -140,18 +136,17 @@ exports.update=function(req,res)
             delete form['created_on'];
 
             //perform db update
-            col.update({'id':form_id},{'$set':form},{safe:true,fsync:true},this);
-        },
-
-        function processResult(err,result) {
-            if (err) throw err;
-
-            delete form['_id'];
-
-            //send server version back to client
-            res.send(form);
+            col.update({'id':form_id},{'$set':form},{safe:true,fsync:true},next);
         }
-    );
+    ],
+    function processResult(err,result) {
+        if (err) throw err;
+
+        delete form['_id'];
+
+        //send server version back to client
+        res.send(form);
+    });
 }
 
 exports.remove=function(req,res)
