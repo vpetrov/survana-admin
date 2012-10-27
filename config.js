@@ -4,6 +4,10 @@ exports.title='Survana Administration';
 exports.publishers={
 };
 
+exports.stores={
+
+};
+
 //the more keys there are to generate, the slower Survana will be at creating surveys and importing responses.
 exports.encryption={
     'keys':10,

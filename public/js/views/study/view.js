@@ -51,6 +51,7 @@ function($,_,Backbone,Alert)
                 'study':model,
                 'publishers':this.publishers
             }));
+
 			return this;
     	},
 
@@ -101,8 +102,6 @@ function($,_,Backbone,Alert)
                         }
                         catch (e)
                         {
-                            console.log('exception',e,'responseText',result.responseText);
-
                             //todo: not sure what to do when the response is not valid JSON.
                             if (result.responseText && result.responseText.length)
                                 message+=responseText;
@@ -122,7 +121,13 @@ function($,_,Backbone,Alert)
 
     	onPublishClick:function(e)
     	{
+            //close the menu if the menu was used to publish the study
+            if ($(e.currentTarget).attr('href'))
+                $(e.currentTarget).parentsUntil('div.btn-group','ul').prev().dropdown('toggle');
+
+            //disable the publish button
             this.enablePublishButton(false);
+
     		this.publish($(e.currentTarget).attr('data-publisher'));
 
     		e.preventDefault();

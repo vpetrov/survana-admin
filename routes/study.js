@@ -13,6 +13,14 @@ var form_blacklist={
     '_id':0
 };
 
+//properties to delete when publishing a study
+var publish_blacklist={
+    '_id':0,
+    'publishers':0,
+    'urls':0,
+    'published':0
+};
+
 function getPublisher(config,p)
 {
     if (config.publishers.hasOwnProperty(p))
@@ -98,8 +106,9 @@ exports.create=function(req,res,next)
  */
 exports.update=function(req,res,next)
 {
-	var db=req.app.db;
-    var config=req.app.config;
+    var app=req.app;
+	var db=app.db;
+    var config=app.config;
 	var col=null;
 	var study=req.body;
 	var study_id=req.params.id;
@@ -214,7 +223,7 @@ exports.update=function(req,res,next)
                 delete full_study['_id'];
 
                 //publish the study (and then proceed to the next step)
-                module.exports.publish(full_study,servers,req.app.privateKey,next);
+                module.exports.publish(full_study,servers,app.keyID,app.privateKey,next);
             });
 		},
 
@@ -288,35 +297,40 @@ exports.genkeys=function(study,encryption)
     //generate ALL the keys!
     for (var i=0;i<nkeys;++i)
     {
-        var sha1=crypto.createHash("sha1");             //prepare to hash the private key to get the ID of this key
         var keypair=ursa.generatePrivateKey(bits);      //a binary representation of the keypair
         var publicKey=keypair.toPublicPem();            //extract public PEM from keypair
         var privateKey=keypair.toPrivatePem();          //extract private PEM from keypair
 
         result.push({
-            'id':sha1.update(publicKey).digest('hex'),  //id of the key
-            'bits':bits,                                //number of bits for the key
-            'public':publicKey.toString(),              //the public PEM
-            'private':privateKey.toString()             //the private PEM
+            'keyID':keypair.toPublicSshFingerprint('hex'),              //id of the key
+            'bits':bits,                                                //number of bits for the key
+            'publicKey':publicKey.toString().replace(/\n|\r/gm,""),      //the public PEM, no newlines
+            'privateKey':privateKey.toString().replace(/\n|\r/gm,"")     //the private PEM, no newlines
         });
     }
 
     return result;
 }
 
-exports.publish=function(study,publishers,privateKey,next)
+exports.publish=function(study,publishers,keyID,privateKey,next)
 {
     //nowhere to publish?
     if (!publishers.length)
         return;
 
+    //remove unwanted properties of the study
+    for (var p in publish_blacklist)
+        delete study[p];
+
     var copies=[];
 
+    //create publishing
     for (var i in publishers)
     {
         copies.push({
             'publisher':publishers[i],
             'study':study,
+            'keyID':keyID,
             'privateKey':privateKey
         });
     }
@@ -331,13 +345,14 @@ function publishWorker(item,next)
 {
     var study=item.study;
     var publisher=item.publisher;
+    var keyID=item.keyID;
     var privateKey=item.privateKey;
 
     console.log('Publishing study ',study.id,' to server: ',publisher.name," with URL",publisher.url);
 
     //remove all private keys from the study object
     for (var i in study.keys)
-        study.keys[i].privateKey=null;
+        delete study.keys[i].privateKey;
 
     console.log('signature',privateKey.hashAndSign('sha256',JSON.stringify(study),'utf8','hex'));
 
@@ -347,6 +362,7 @@ function publishWorker(item,next)
         method:'POST',
         json:{
             'study':study,
+            'keyID':keyID,
             'signature':privateKey.hashAndSign('sha256',JSON.stringify(study),'utf8','hex')
         },
         encoding:'utf8'
@@ -366,22 +382,21 @@ function publishWorker(item,next)
         //but if 50 years of network design miraculously brought the bits back over the wire, then read the public URL.
         if (!err)
         {
-            try
+            if (typeof(body)==='object')
             {
-                //also, we expect the response to be in JSON format.
-                var data=JSON.parse(body);
-
                 //let's see if the server was nice and returned a meaningful status code (which it should)
-                if (response.code==200)
+                if (response.statusCode==200)
                 {
                     result['success']=1;    //bitter sweet
-                    result['url']=data.url; //this lets every server designate their own (permanent) URLs for each study
+                    result['url']=body.url; //this lets every server designate their own (permanent) URLs for each study
                 }
+                else if (body.message)
+                    result['message']=body.message; //some logical error happened, let's hope the server returned it to us
                 else
-                    result['message']=data.message; //some logical error happened, let's hope the server returned it to us
+                    result['message']="No details about the error have been received from the publishing service.";
 
             }
-            catch (e)
+            else
             {
                 //if the JSON returned was invalid, this means the server responded with 200, but it might have been
                 //an HTML page.

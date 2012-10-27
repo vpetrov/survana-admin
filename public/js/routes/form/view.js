@@ -1,30 +1,28 @@
 define([
-			'jquery',
-			'underscore',
-			'views/form/view'
-		],
-function($,_,ViewFormView)
-{
-	return function(fid,options)
-	{
-		var store=options.store;
+    'jquery',
+    'underscore',
+    'views/form/view'
+],
+    function ($, _, ViewFormView) {
+        "use strict";
 
-		console.log('view_form',options);
+        return function (fid, options) {
+            var store = options.store;
 
-		if (!this.cache)
-			this.cache=[];
+            if (!this.cache)
+                this.cache = [];
 
-		if (!_.has(this.cache,fid))
-		{
-			this.cache[fid]=new ViewFormView({
-				collection:store.forms,
-				model:store.forms.get(fid)
-			});
-			this.cache[fid].render();
-		}
-		else
-			this.cache[fid].delegateEvents();
+            if (!_.has(this.cache, fid)) {
+                this.cache[fid] = new ViewFormView({
+                    collection: store.forms,
+                    model:      store.forms.get(fid)
+                });
 
-		$('#content').html(this.cache[fid].el);
-	}
-});
+                this.cache[fid].render();
+            } else {
+                this.cache[fid].delegateEvents();
+            }
+
+            $('#content').html(this.cache[fid].el);
+        }
+    });

@@ -1,41 +1,39 @@
 define([
-			'jquery',
-			'underscore',
-			'backbone'
-		],
-function($,_,Backbone)
-{
-    return Backbone.View.extend({
-    	template:_.template($('#tpl-study-list').html()),
-    	itemTemplate:_.template($('#tpl-study-list-item').html()),
+    'jquery',
+	'underscore',
+	'backbone'
+],
+    function ($, _, Backbone) {
+        "use strict";
 
-    	initialize:function(options){
-    		_.bindAll(this,'render','onStudyAdded');
+        return Backbone.View.extend({
+            template:     _.template($('#tpl-study-list').html()),
+            itemTemplate: _.template($('#tpl-study-list-item').html()),
 
-			this.collection.on("change reset",this.render);
-			this.collection.on("add",this.onStudyAdded)
-    	},
+            initialize: function () {
+                _.bindAll(this, 'render', 'onStudyAdded');
 
-    	events:{
-    	},
+                this.collection.on("change reset", this.render);
+                this.collection.on("add", this.onStudyAdded);
+            },
 
-    	render:function()
-    	{
-    		console.log('study items',this.collection.toJSON());
-    		$(this.el).html(this.template({
-    			'items':this.collection.toJSON(),
-    			'itemTemplate':this.itemTemplate
-    		}));
+            events: {
+            },
 
-    		return this;
-	    },
+            render: function () {
+                $(this.el).html(this.template({
+                    'items': this.collection.toJSON(),
+                    'itemTemplate': this.itemTemplate
+                }));
 
-	    onStudyAdded:function(newitem,model)
-	    {
-	    	this.$el.find('tbody').append(this.itemTemplate({
-                'study':newitem
-            }));
-	    }
-   });
+                return this;
+            },
 
-}); //define
+            onStudyAdded: function (newitem) {
+                this.$el.find('tbody').append(this.itemTemplate({
+                    'study': newitem.toJSON()
+                }));
+            }
+        });
+
+    }); //define

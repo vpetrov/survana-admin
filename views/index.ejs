@@ -122,8 +122,8 @@
                             <div id="code-editor-container">&nbsp;</div>
                           </fieldset>
                           <hr>
-                          <input type="submit">
-                          <input type="reset" value="Clear">
+                          <input type="submit" class="btn btn-primary">
+                          <input type="reset" value="Clear" class="btn">
                         </form>
                     </div>
                 </div>
@@ -333,7 +333,7 @@
                             <div id='study-forms-container' class="span6 build-pad-mv" style="margin-left:0px"></div>
                           </fieldset>
 
-                          <input type="submit">
+                          <input type="submit" class="btn btn-primary">
                         </form>
                     </div>
                 </div>
@@ -391,7 +391,12 @@
                             <% for (var i in study.publishers) {%>
                                 <% var server=study.publishers[i], url=study.urls[server]; %>
                                 <div class="row">
-                                    <div class="span1"><%= server %>:</div>
+                                    <div class="span1">
+                                        <span class="label" rel="tooltip" title="<%= server %>">
+                                        <%= server %>
+                                        </span>
+
+                                    </div>
                                     <div class="span3"><a href='<%- url %>'><%- url %></a></div>
                                 </div>
                             <% } %>
@@ -453,11 +458,12 @@
             <tr>
                 <th>Study</th>
                 <th>Status</th>
-                <td>Created On</td>
+                <th>Created On</th>
             </tr>
         </thead>
         <tbody>
-            <% _.each(items,function(item){ %>
+            <% var sortedItems=items.sort( function(a,b) { return b.created_on - a.created_on; } ); %>
+            <% _.each(sortedItems,function(item){ %>
                 <%= itemTemplate({'study':item}) %>
             <% }); %>
         </tbody>

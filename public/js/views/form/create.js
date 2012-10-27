@@ -1,106 +1,96 @@
 define([
-			'jquery',
-			'underscore',
-			'backbone',
-			'models/form',
-			'views/alert',
-			'errors',
-			'views/form/editor'
-		],
-function($,_,Backbone,Form,Alert,Errors,Editor)
-{
-    return Backbone.View.extend({
-    	template:_.template($('#tpl-form-create').html()),
-    	editor:null,
+    'jquery',
+    'underscore',
+    'backbone',
+    'models/form',
+    'views/alert',
+    'errors',
+    'views/form/editor'
+],
+    function ($, _, Backbone, Form, Alert, Errors, Editor) {
+        "use strict";
 
-    	initialize:function(options){
-    		console.log('Initializing Create Form View',options);
+        return Backbone.View.extend({
+            template:   _.template($('#tpl-form-create').html()),
+            editor:     null,
 
-    		_.bindAll(this,'onSubmit','onSubmitError','onValidationError');
-    	},
+            initialize: function () {
+                _.bindAll(this, 'onSubmit', 'onSubmitError', 'onValidationError');
+            },
 
-    	events:{
-    		'submit #create-form': 'onSubmit'
-    	},
+            events: {
+                'submit #create-form': 'onSubmit'
+            },
 
-    	render:function()
-    	{
-    		$(this.el).html(this.template());
+            render: function () {
+                $(this.el).html(this.template());
 
-    		if (!this.editor)
-    		{
-    			this.editor=new Editor();
+                if (!this.editor) {
+                    this.editor = new Editor();
 
-    			this.editor.render();
-    			this.$el.find('#code-editor-container').html(this.editor.el);
-    		}
+                    this.editor.render();
 
-			console.log('editor',this.editor);
-    		//console.log(Ace); //NOTE: ace.edit('editor) needs to be called after the elemnt has been attached to the DOM
+                    this.$el.find('#code-editor-container').html(this.editor.el);
+                }
 
-    		return this;
-	    },
+                return this;
+            },
 
-	    onSubmit:function(e)
-	    {
-	    	console.log('on form create submit');
+            onSubmit: function (e) {
+                var data    = {},
+                    forms   = this.collection,
+                    router  = this.router,
+                    form    = null;
 
-            var data={};
-            var forms=this.collection;
-            var router=this.router;
+                //copy all form values into the study object
+                _.each($(e.currentTarget).serializeArray(), function (item) {
+                    data[item.name] = item.value;
+                });
 
-            //copy all form values into the study object
-            _.each($(e.currentTarget).serializeArray(),function(item,i){
-                data[item.name]=item.value;
-            });
+                //copy the document text
+                data.data = this.editor.getText();
 
-            //copy the document text
-            data['data']=this.editor.getText();
+                try {
+                    form = new Form(data);
 
-            try{
-	            var form=new Form(data);
+                    form.save({}, {
+                        'wait':     true,
+                        'success':  function (model, updates) {
+                            model.set(updates, {silent: true});
+                            forms.add(model);
 
-	            form.save({},{
-	            	'wait':true,
-	                'success':function(model,updates)
-	                {
-	                    model.set(updates,{silent:true});
-	                    forms.add(model);
+                            router.navigate('study/create', {'trigger': true});
+                        },
 
-	                    router.navigate('study/create',{'trigger':true});
-	                },
+                        'error': this.onSubmitError
+                    });
+                } catch (err) {
+                    console.error(err, err.message);
+                }
 
-	                'error':this.onSubmitError
-	            });
-			}
-			catch (err)
-			{
-				console.error(err,err.message);
-			}
+                e.preventDefault();
+                return false;
+            },
 
-	    	e.preventDefault();
-	    	return false;
-	    },
+            onSubmitError: function (model, result, caller) {
+                Errors.onSubmit(this, model, result, caller);
+            },
 
-	    onSubmitError:function(model,result,caller)
-	    {
-	    	Errors.onSubmit(this,model,result,caller);
-	    },
+            onValidationError: function (model, errors) {
+                var msg = "", e;
 
-		onValidationError:function(model,errors)
-		{
-			var msg="";
+                for (e in errors) {
+                    if (errors.hasOwnProperty(e)) {
+                        msg += errors[e] + "\n";
+                    }
+                }
 
-			for (var e in errors)
-			{
-				msg+=errors[e]+"\n";
-			}
+                if (!msg.length) {
+                    msg = "We were unable to validate your input data. Please try again.";
+                }
 
-			if (!msg.length)
-				msg="We were unable to validate your input data. Please try again."
+                Alert.show(msg);
+            }
+        });
 
-			Alert.show(msg);
-		}
-    });
-
-}); //define
+    }); //define
