@@ -23,14 +23,15 @@ define([
             initialize: function () {
                 if (!this.get("title")) {
                     this.set({
-                        "gid":          this.defaults.gid,
-                        "group":        this.defaults.group,
-                        "code":         this.defaults.code,
-                        "title":        this.defaults.title,
-                        "version":      this.defaults.version,
-                        "created_on":   this.defaults.created_on,
-                        "data":         this.defaults.data,
-                        "published":    this.defaults.published
+                        "gid":          this.get('gid')         || this.defaults.gid,
+                        "group":        this.get('group')       || this.defaults.group,
+                        "code":         this.get('code')        || this.defaults.code,
+                        "title":        this.get('title')       || this.defaults.title,
+                        "version":      this.get('version')     || this.defaults.version,
+                        "created_on":   this.get('created_on')  || this.defaults.created_on,
+                        "data":         this.get('data')        || this.defaults.data,
+                        "published":    this.get('published')   || this.defaults.published,
+                        "store-url":    this.get('store-url')   || this.detauls['store-url']
                     });
                 }
             },

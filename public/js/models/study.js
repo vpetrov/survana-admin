@@ -13,7 +13,8 @@ define([
                     publishers: [],
                     urls: {},
                     install: true,
-                    forms: []
+                    forms: [],
+                    "store-url": null
                 };
             },
 
@@ -24,7 +25,8 @@ define([
                     'publishers':   this.get('publishers')  || this.defaults.publishers,
                     'urls':         this.get('urls')        || this.defaults.urls,
                     'install':      this.get('install')     || this.defaults.install,
-                    'forms':        this.get('forms')       || this.defaults.forms
+                    'forms':        this.get('forms')       || this.defaults.forms,
+                    'store-url':    this.get('store-url')   || this.detauls['store-url']
                 });
             },
 
