@@ -31,7 +31,7 @@ define([
                         "created_on":   this.get('created_on')  || this.defaults.created_on,
                         "data":         this.get('data')        || this.defaults.data,
                         "published":    this.get('published')   || this.defaults.published,
-                        "store-url":    this.get('store-url')   || this.detauls['store-url']
+                        "store-url":    this.get('store-url')   || this.defaults['store-url']
                     });
                 }
             },

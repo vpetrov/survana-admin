@@ -26,7 +26,7 @@ define([
                     'urls':         this.get('urls')        || this.defaults.urls,
                     'install':      this.get('install')     || this.defaults.install,
                     'forms':        this.get('forms')       || this.defaults.forms,
-                    'store-url':    this.get('store-url')   || this.detauls['store-url']
+                    'store-url':    this.get('store-url')   || this.defaults['store-url']
                 });
             },
 
