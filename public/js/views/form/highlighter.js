@@ -1,45 +1,44 @@
 define(
-		[
-			'jquery',
-			'underscore',
-			'backbone',
-            'ace/ext/static_highlight',
-            'ace/mode/json',
-            'ace/theme/chrome'
-		],
-function ($,_,Backbone,AceHighlighter,AceMode,AceTheme)
-{
-	return Backbone.View.extend({
+    [
+        'jquery',
+        'underscore',
+        'backbone',
+        'ace/ext/static_highlight',
+        'ace/mode/json',
+        'ace/theme/chrome'
+    ],
+    function ($, _, Backbone, AceHighlighter, AceMode, AceTheme) {
+        "use strict";
 
-        highlighter:AceHighlighter,
-        text:"",
-		initialize:function(options)
-		{
-			console.log('Initializing Highlighter View',options);
-            this.text=options.text;
-			_.bindAll(this,'render','getHighlighter','getText');
-		},
+        return Backbone.View.extend({
 
-		render:function()
-		{
-			var result=this.highlighter.render(this.text,new AceMode.Mode(),AceTheme);
-            this.$el.html('<style type="text/css"></style><div></div>');
-            this.$el.children('style').html(result.css);
-            this.$el.children('div').html(result.html);
-            //hide the ugly border
-            this.$el.find('div.ace_editor').css('border','none')
+            highlighter: AceHighlighter,
+            text: "",
+            initialize: function (options) {
+                this.text = options.text;
+                _.bindAll(this, 'render', 'getHighlighter', 'getText');
+            },
 
-			return this;
-		},
+            render: function () {
+                var result = this.highlighter.render(this.text, new AceMode.Mode(), AceTheme),
+                    style = $(document.createElement('style')).attr('type', 'text/css').html(result.css),
+                    source = $(document.createElement('div')).html(result.html);
 
-        getText:function()
-        {
-            return this.highlighter;
-        },
+                this.$el.append(style).append(source);
 
-        getText:function()
-        {
-            return this.text;
-        }
-	});
-});
+                //hide the ugly border
+                this.$el.find('div.ace_editor').css('border', 'none');
+
+                return this;
+            },
+
+            getHighlighter: function () {
+                return this.highlighter;
+            },
+
+            getText: function () {
+                return this.text;
+            }
+        });
+    }
+);

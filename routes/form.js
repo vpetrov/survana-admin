@@ -1,145 +1,161 @@
-var async=require('async');
+var async = require('async');
 
-exports.list=function(req,res)
-{
-	res.send('Form::list');
-}
+var HTTP_NOT_FOUND = 404;
 
-exports.get=function(req,res)
-{
-	res.send('Form::get');
-}
+exports.list = function (req, res) {
+    "use strict";
 
-exports.create=function(req,res,next)
-{
-	var db=req.app.db;
-	var col=null;
-	var form=req.body;
-	var gid=form['gid'];
+    res.send('Form::list');
+};
 
-	if (typeof(form)!=='object')
-		throw "Invalid request";
+exports.get = function (req, res) {
+    "use strict";
 
-	form['data']=JSON.parse(form['data']);
+    res.send('Form::get');
+};
 
-	console.log('form create',gid);
+exports.create = function (req, res, next) {
+    "use strict";
 
-	async.waterfall([
+    var db = req.app.db,
+        col = null,
+        form = req.body,
+        gid = form.gid;
 
-		function getCollection(next2){
-			db.collection('form',next2);
-		},
-		function generateUniqueId(collection,next2){
-			col=collection;
-			db.uniqueId(collection,'id',next2);
-		},
+    if (typeof (form) !== 'object') {
+        throw "Invalid request";
+    }
 
-		function setId(uniqueId,next2){
-			form['id']=uniqueId;
-			form['created_on']=(new Date()).valueOf();
+    form.data = JSON.parse(form.data);
 
-			next2(null,form);
-		},
+    async.waterfall({
 
-		//S1 and S2 are mutually exclusive. 'gid' is used as guard.
-		function S1_generateGroupId(form,next2){
-			if (gid!='0')
-                return next2(null,form);  //does the form have a group already?
+        'getCollection': function (next2) {
+            db.collection('form', next2);
+        },
 
-			db.uniqueId(col,'id',next2);
-		},
+        'generateUniqueId': function (collection, next2) {
+            col = collection;
+            db.uniqueId(collection, 'id', next2);
+        },
 
-		function S1_setGroup(uniqueId,next2){
-			if (gid!='0')
-                return next2(null,form);
+        'setId': function (uniqueId, next2) {
+            form.id = uniqueId;
+            form.created_on = (new Date()).valueOf();
 
-			form['gid']=uniqueId;
-			form['group']=form['title'];
+            next2(null, form);
+        },
 
-            next2(null,form);
-		},
+        //S1 and S2 are mutually exclusive. 'gid' is used as guard.
+        'S1_generateGroupId': function (form, next2) {
+            if (gid === '0') {
+                db.uniqueId(col, 'id', next2);
+            } else {
+                next2(null, form);  //does the form have a group already?
+            }
+        },
 
-		function S2_findGroup(form,next2){
-			if (gid=='0')
-                return next2(null,form);
+        'S1_setGroup': function (uniqueId, next2) {
+            if (gid === '0') {
+                form.gid = uniqueId;
+                form.group = form.title;
 
-			col.findOne({'gid':gid},next2);
-		},
+                next2(null, form);
+            } else {
+                next2(null, form);
+            }
+        },
 
-		function S2_updateGroup(result,next2){
-			if (gid=='0')
-                return next2(null,form);
+        'S2_findGroup': function (form, next2) {
+            if (gid === '0') {
+                next2(null, form);
+            } else {
+                col.findOne({'gid': gid}, next2);
+            }
+        },
 
-			if (!result)
-				return next2(Error('Group id '+gid+' not found.'));
+        'S2_updateGroup': function (result, next2) {
+            if (gid === '0') {
+                next2(null, form);
+            } else if (!result) {
+                next2(new Error('Group id ' + gid + ' not found.'));
+            } else {
+                form.group = result.group;
+                next2(null, form);
+            }
+        },
 
-			form['group']=result['group'];
+        'addForm': function (form, next2) {
+            col.insert(form, {safe: true, fsync: true}, next2);
+        }
+    },
 
-			next2(null,form);
-		},
+        function processResult(err) {
+            if (err) {
+                next(err);
+                return;
+            }
 
-		function addForm(form,next2){
-			col.insert(form,{safe:true,fsync:true},next2);
-		}
-    ],
-
-    function processResult(err,result) {
-        if (err)
-            return next(err);
-
-        delete form['_id']; //remove internal ID
-        res.send(form);
-    });
-}
+            delete form._id; //remove internal ID
+            res.send(form);
+        });
+};
 
 /** UPDATE
  */
-exports.update=function(req,res)
-{
-    var db=req.app.db;
-    var form=req.body;
-    var form_id=req.params.id;
-    var col=null;
+exports.update = function (req, res) {
+    "use strict";
 
-    if (typeof(form)!=='object')
+    var db = req.app.db,
+        form = req.body,
+        formId = req.params.id,
+        col;
+
+    if (typeof (form) !== 'object') {
         throw 'Invalid request';
+    }
 
     //TODO: validate input data (malicious js functions?)
 
-    async.waterfall([
-        function getCollection(next){
-            db.collection('form',next);
+    async.waterfall({
+        'getCollection': function (next) {
+            db.collection('form', next);
         },
 
-        function getExistingForm(collection,next){
-            col=collection;
-            col.findOne({'id':form_id},next);
+        'getExistingForm': function (collection, next) {
+            col = collection;
+            col.findOne({'id': formId}, next);
         },
 
-        function updateForm(item,next){
-            if (!item)
-                return res.send('Form not found',404);
+        'updateForm': function (item, next) {
+            if (!item) {
+                res.send('Form not found', HTTP_NOT_FOUND);
+                return;
+            }
 
             //unset server generated fields
-            delete form['_id'];
-            delete form['id'];
-            delete form['created_on'];
+            delete form._id;
+            delete form.id;
+            delete form.created_on;
 
             //perform db update
-            col.update({'id':form_id},{'$set':form},{safe:true,fsync:true},next);
+            col.update({'id': formId}, {'$set': form}, {safe: true, fsync: true}, next);
         }
-    ],
-    function processResult(err,result) {
-        if (err) throw err;
+    },
+        function processResult(err) {
+            if (err) {
+                throw err;
+            }
 
-        delete form['_id'];
+            delete form._id;
 
-        //send server version back to client
-        res.send(form);
-    });
-}
+            //send server version back to client
+            res.send(form);
+        });
+};
 
-exports.remove=function(req,res)
-{
-	res.send('Form::remove');
-}
+exports.remove = function (req, res) {
+    "use strict";
+
+    res.send('Form::remove');
+};

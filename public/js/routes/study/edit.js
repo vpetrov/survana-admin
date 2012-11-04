@@ -1,9 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'views/study/view'
+    'views/study/edit'
 ],
-    function ($, _, ViewStudyView) {
+    function ($, _, EditStudyView) {
         "use strict";
 
         var cache = [];
@@ -12,12 +12,10 @@ define([
             var store = options.store;
 
             if (!_.has(cache, sid)) {
-                cache[sid] = new ViewStudyView({
-                    collection: store.forms,
-                    publishers: store.publishers,
-                    model:      store.studies.get(sid)
+                cache[sid] = new EditStudyView({
+                    collection: store.studies,
+                    model: store.studies.get(sid)
                 });
-
                 cache[sid].render();
             } else {
                 cache[sid].delegateEvents();
@@ -25,4 +23,4 @@ define([
 
             $('#content').html(cache[sid].el);
         };
-    }); //define
+    });

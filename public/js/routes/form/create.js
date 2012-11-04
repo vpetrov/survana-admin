@@ -6,15 +6,14 @@ define([
         "use strict";
 
         return function (options) {
-            var store = options.store;
+            var store = options.store,
+                createFormView = new CreateFormView({
+                    collection: store.forms
+                });
 
-            this.createFormView = new CreateFormView({
-                collection: store.forms
-            });
+            createFormView.render();
 
-            this.createFormView.render();
-
-            $('#content').html(this.createFormView.el);
+            $('#content').html(createFormView.el);
 
             //TODO: Update navigation
         };

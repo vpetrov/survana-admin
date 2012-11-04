@@ -1,49 +1,51 @@
 /** app must have 'log' and 'dirname' properties */
 
-var name=require("./package.json").name;
-var path=require('path');
-var fs=require('fs');
+var moduleName = require("./package.json").name;
+var path = require('path');
+var fs = require('fs');
 
-exports.config=require('./config');
+exports.config = require('./config');
 
-exports.server=function(survana,express)
-{
-	var app=this.app=express.createServer();
+exports.server = function (survana, express) {
+    "use strict";
 
-	app.configure(function()
-	{
-		app.set('views', __dirname + '/views');
-		app.set('view engine','ejs');
-		app.set('view options',{
-			layout:false
-		});
+    var app = express.createServer();
+
+    this.app = app;
+
+    app.configure(function () {
+        app.set('views', __dirname + '/views');
+        app.set('view engine', 'ejs');
+        app.set('view options', {
+            layout: false
+        });
 
         app.use(express.methodOverride());
         app.use(express.bodyParser());
-        app.use(express.static(__dirname+'/public'));
+        app.use(express['static'](__dirname + '/public')); //'static' is a reserved keyword
         app.use(app.router);
 
-        app.log=survana.log.sub(name);
-        app.dirname=__dirname;
+        app.log = survana.log.sub(moduleName);
+        app.dirname = __dirname;
     });
 
     //set up routes
-    survana.routing(app,this.config.routes);
+    survana.routing(app, this.config.routes);
 
-	app.log.info('reporting in!');
+    app.log.info('reporting in!');
 
-	app.config=this.config;
-	app.dbserver=new survana.db(this.config.db);
+    app.config = this.config;
+    app.dbserver = new survana.db(this.config.db);
 
-	//open a database connection
-	app.dbserver.connect(function(db){
-		app.db=db;
-	},
-	function(error){
-		throw error;
-	});
+    //open a database connection
+    app.dbserver.connect(function (db) {
+        app.db = db;
+    },
+        function (error) {
+            throw error;
+        });
 
-    this.config.publishers=survana.readKeys(this.config.publishers);
+    this.config.publishers = survana.readKeys(this.config.publishers);
 
-	return this.app;
-}
+    return this.app;
+};

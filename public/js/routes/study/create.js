@@ -6,16 +6,15 @@ define([
         "use strict";
 
         return function (options) {
-            var store = options.store;
+            var store = options.store,
+                createStudyView = new CreateStudyView({
+                    collection: store.studies,
+                    forms: store.forms
+                });
 
-            this.createStudyView = new CreateStudyView({
-                collection: store.studies,
-                forms:      store.forms
-            });
+            createStudyView.render();
 
-            this.createStudyView.render();
-
-            $('#content').html(this.createStudyView.el);
+            $('#content').html(createStudyView.el);
 
             //TODO: update navigation
         };

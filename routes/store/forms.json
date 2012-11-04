@@ -1,110 +1,110 @@
 [
-   {
-      "id":"EHzg213",
-      "gid":1,
-      "code":"EH",
-      "group":"Ethnicity\/Handedness",
-      "title":"Ethnicity\/Handedness",
-      "version":"first",
-      "created_on":18872437542
-   },
-   {
-      "id":"EH22uhrb1",
-      "gid":1,
-      "code":"EH",
-      "group":"Ethnicity\/Handedness",
-      "title":"Ethnicity,Handedness",
-      "version":"second",
-      "created_on":19872437542
-   },
-   {
-      "id":"EHlk0265",
-      "gid":1,
-      "code":"EH",
-      "group":"Ethnicity\/Handedness",
-      "title":"Ethnicity\/Handedness",
-      "version":"third",
-      "created_on":22098482202
-   },
-   {
-      "id":"EHla01",
-      "gid":1,
-      "code":"EH",
-      "group":"Ethnicity\/Handedness",
-      "title":"Ethnicity \/ Handedness",
-      "version":"forth",
-      "created_on":29828117172
-   },
-   {
-      "id":"DEMsdg213",
-      "gid":2,
-      "group":"Demographics",
-      "code":"DEM",
-      "title":"Demographics",
-      "version":"1.0",
-      "created_on":18872437541
-   },
-   {
-      "id":"DEMnj2p12",
-      "gid":2,
-      "group":"Demographics",
-      "code":"DEM",
-      "title":"Ridiculously Long Title: Demographics",
-      "version":"1.1",
-      "created_on":19872437542
-   },
-   {
-      "id":"DEMkjbn233",
-      "gid":2,
-      "group":"Demographics",
-      "code":"DEM",
-      "title":"Demographix",
-      "version":"1.2",
-      "created_on":19972447543
-   },
-   {
-      "id":"DEMn283n1",
-      "gid":2,
-      "group":"Demographics",
-      "code":"DEM",
-      "title":"Demographics",
-      "version":"1.3",
-      "created_on":20172447568
-   },
-   {
-      "id":"DEMn283n1",
-      "gid":2,
-      "group":"Demographics",
-      "code":"DEM",
-      "title":"Demographics",
-      "version":"1.4",
-      "created_on":21174829291
-   },
-   {
-      "id":"EDUskdjn23",
-      "gid":3,
-      "group":"Education",
-      "code":"EDU",
-      "title":"Education",
-      "version":"0.1.a",
-      "created_on":11034812289
-   },
-   {
-      "id":"EDU22z4hrb1",
-      "gid":3,
-      "group":"Education",
-      "code":"EDU",
-      "title":"Education",
-      "version":"0.1.b",
-      "created_on":11174829290
-   },
-   {
-      "id":"EDUkvv265",
-      "gid":3,
-      "group":"Education",
-      "code":"EDU",
-      "title":"Education",
-      "version":"0.1.c",
-      "created_on":13174955291
-   }
+    {
+        "id": "EHzg213",
+        "gid": 1,
+        "code": "EH",
+        "group": "Ethnicity\/Handedness",
+        "title": "Ethnicity\/Handedness",
+        "version": "first",
+        "created_on": 18872437542
+    },
+    {
+        "id": "EH22uhrb1",
+        "gid": 1,
+        "code": "EH",
+        "group": "Ethnicity\/Handedness",
+        "title": "Ethnicity,Handedness",
+        "version": "second",
+        "created_on": 19872437542
+    },
+    {
+        "id": "EHlk0265",
+        "gid": 1,
+        "code": "EH",
+        "group": "Ethnicity\/Handedness",
+        "title": "Ethnicity\/Handedness",
+        "version": "third",
+        "created_on": 22098482202
+    },
+    {
+        "id": "EHla01",
+        "gid": 1,
+        "code": "EH",
+        "group": "Ethnicity\/Handedness",
+        "title": "Ethnicity \/ Handedness",
+        "version": "forth",
+        "created_on": 29828117172
+    },
+    {
+        "id": "DEMsdg213",
+        "gid": 2,
+        "group": "Demographics",
+        "code": "DEM",
+        "title": "Demographics",
+        "version": "1.0",
+        "created_on": 18872437541
+    },
+    {
+        "id": "DEMnj2p12",
+        "gid": 2,
+        "group": "Demographics",
+        "code": "DEM",
+        "title": "Ridiculously Long Title: Demographics",
+        "version": "1.1",
+        "created_on": 19872437542
+    },
+    {
+        "id": "DEMkjbn233",
+        "gid": 2,
+        "group": "Demographics",
+        "code": "DEM",
+        "title": "Demographix",
+        "version": "1.2",
+        "created_on": 19972447543
+    },
+    {
+        "id": "DEMn283n1",
+        "gid": 2,
+        "group": "Demographics",
+        "code": "DEM",
+        "title": "Demographics",
+        "version": "1.3",
+        "created_on": 20172447568
+    },
+    {
+        "id": "DEMn283n1",
+        "gid": 2,
+        "group": "Demographics",
+        "code": "DEM",
+        "title": "Demographics",
+        "version": "1.4",
+        "created_on": 21174829291
+    },
+    {
+        "id": "EDUskdjn23",
+        "gid": 3,
+        "group": "Education",
+        "code": "EDU",
+        "title": "Education",
+        "version": "0.1.a",
+        "created_on": 11034812289
+    },
+    {
+        "id": "EDU22z4hrb1",
+        "gid": 3,
+        "group": "Education",
+        "code": "EDU",
+        "title": "Education",
+        "version": "0.1.b",
+        "created_on": 11174829290
+    },
+    {
+        "id": "EDUkvv265",
+        "gid": 3,
+        "group": "Education",
+        "code": "EDU",
+        "title": "Education",
+        "version": "0.1.c",
+        "created_on": 13174955291
+    }
 ]

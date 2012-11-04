@@ -1,269 +1,252 @@
 define([
-			'jquery',
-			'underscore',
-			'backbone',
-			'jquery-ui',
-			'bootstrap',
-			'models/form/list/proxy'
-		],
-function($,_,Backbone,jQueryUI,bootstrap,FormListProxy)
-{
-    return Backbone.View.extend({
-        proxyCollection:null,
-        template:_.template($('#tpl-study-forms').html()),
-        itemTemplate:_.template($('#tpl-study-forms-item').html()),
-        titleTemplate:_.template($('#tpl-study-forms-title').html()),
-        menuTemplate:_.template($('#tpl-form-version-menu').html()),
+    'jquery',
+    'underscore',
+    'backbone',
+    'jquery-ui',
+    'bootstrap',
+    'models/form/list/proxy'
+],
+    function ($, _, Backbone, jQueryUI, bootstrap, FormListProxy) {
+        "use strict";
 
-        sortStartedAt:-1,
-        sortStoppedAt:-1,
+        return Backbone.View.extend({
+            proxyCollection: null,
+            template: _.template($('#tpl-study-forms').html()),
+            itemTemplate: _.template($('#tpl-study-forms-item').html()),
+            titleTemplate: _.template($('#tpl-study-forms-title').html()),
+            menuTemplate: _.template($('#tpl-form-version-menu').html()),
 
-        initialize:function(options){
-        	console.log('Initializing StudyFormsView',options);
-            _.bindAll(this,'render','onItemInserted','getModel','getForms','sortStarted','sortEnded','insert','onMenuItemSelect',
-            		  'onDragOut','onDragIn', 'onDragStop');
+            sortStartedAt: -1,
+            sortStoppedAt: -1,
 
-            this.collection.on("change",this.render);
+            initialize: function (options) {
+                console.log('Initializing StudyFormsView', options);
+                _.bindAll(this, 'render', 'onItemInserted', 'getModel', 'getForms', 'sortStarted', 'sortEnded',
+                          'insert', 'onMenuItemSelect', 'onDragOut', 'onDragIn', 'onDragStop');
 
-            //proxy model
-            this.proxyCollection=new FormListProxy();
-            //this.render(this.collection);
-        },
+                this.collection.on("change", this.render);
 
-        events:{
-        	'click a[data-form-id]': 	'onMenuItemSelect'
-        },
+                //proxy model
+                this.proxyCollection = new FormListProxy();
+                //this.render(this.collection);
+            },
 
-        render:function(model)
-        {
-            var items;
+            events: {
+                'click a[data-form-id]': 'onMenuItemSelect'
+            },
 
-            if (this.proxyCollection.length)
-            	items=this.proxyCollection.toJSON();
-            else
-            	items=[];
+            render: function () {
+                var items;
 
-            //create template
-            $(this.el).html(this.template({
-                'items':items,
-                'itemTemplate':this.itemTemplate,
-                'titleTemplate':this.titleTemplate,
-                'menuTemplate':this.menuTemplate
-            }));
+                if (this.proxyCollection.length) {
+                    items = this.proxyCollection.toJSON();
+                } else {
+                    items = [];
+                }
 
-            //sortable list properties
-            this.$('.sortable-list').sortable({
-                'revert': 		false,
-                'distance': 	10,
-                'receive': 		$.proxy(this.onItemInserted,this),
-                'start': 		$.proxy(this.sortStarted,this),
-                'beforeStop': 	$.proxy(this.sortEnded,this),
-                'stop': 		$.proxy(this.updateIndexes,this),
-                'out':          $.proxy(this.onDragOut,this),
-                'over': 		$.proxy(this.onDragIn,this)
-            })
+                //create template
+                $(this.el).html(this.template({
+                    'items': items,
+                    'itemTemplate': this.itemTemplate,
+                    'titleTemplate': this.titleTemplate,
+                    'menuTemplate': this.menuTemplate
+                }));
 
-            //disable user select (conflicts with dragging)
-            $('.sortable-list').disableSelection();
+                //sortable list properties
+                this.$('.sortable-list').sortable({
+                    'revert': false,
+                    'distance': 10,
+                    'receive': $.proxy(this.onItemInserted, this),
+                    'start': $.proxy(this.sortStarted, this),
+                    'beforeStop': $.proxy(this.sortEnded, this),
+                    'stop': $.proxy(this.updateIndexes, this),
+                    'out': $.proxy(this.onDragOut, this),
+                    'over': $.proxy(this.onDragIn, this)
+                });
 
-            return this;
-        },
+                //disable user select (conflicts with dragging)
+                $('.sortable-list').disableSelection();
 
-        onItemInserted:function(e,ui)
-        {
-        	var id=ui.item.children('a[data-form-id]').attr('data-form-id');
-        	var model=this.collection.get(id);
-        	var el=this.$('li.draggable').not('.active');
+                return this;
+            },
 
-        	this.proxyCollection.add({
-        		'index':this.sortStartedAt,
-        		'form':model
-        	});
+            onItemInserted: function (e, ui) {
+                var id = ui.item.children('a[data-form-id]').attr('data-form-id'),
+                    model = this.collection.get(id),
+                    el = this.$('li.draggable').not('.active');
 
-        	this.replace(el,this.sortStartedAt,id);
-        },
+                this.proxyCollection.add({
+                    'index': this.sortStartedAt,
+                    'form': model
+                });
 
-        replace:function(item,index,id)
-        {
-        	var model=this.collection.get(id);
-        	var proxyModel=this.proxyCollection.where({'index':index});
+                this.replace(el, this.sortStartedAt, id);
+            },
 
-        	if (typeof model==='undefined' || !model)
-        	{
-        		console.error('Could not find model with ID',id);
-        		return false;
-        	}
+            replace: function (item, index, id) {
+                var model = this.collection.get(id),
+                    proxyModel = this.proxyCollection.where({'index': index}),
+                    group,
+                    el;
 
-        	if (proxyModel.length>1)
-        	{
-        		console.error('Consistency error: Found more than 1 item at position',index,proxyModel);
-        		return false;
-        	}
+                if (model === undefined || !model) {
+                    console.error('Could not find model with ID', id);
+                    return false;
+                }
 
-        	var group=this.collection.
-        				//find all forms belonging to this gid
-        				where({'gid':model.get('gid')}).
-        				//convert all results to JSON
-						map(function(item){
-								return item.toJSON()
-						});
+                if (proxyModel.length > 1) {
+                    console.error('Consistency error: Found more than 1 item at position', index, proxyModel);
+                    return false;
+                }
 
-			//sort in descending order of creation time
-			group.sort(function(a,b){return b['created_on']-a['created_on']});
+                group = this.collection.
+                    //find all forms belonging to this gid
+                    where({'gid': model.get('gid')}).
+                    //convert all results to JSON
+                    map(function (item) {
+                        return item.toJSON();
+                    });
 
-			//replace the form model in the current proxy model
-			if (proxyModel.length)
-				proxyModel[0].set('form',model);
-			else
-				//add a new model to the proxy collection
-	        	this.proxyCollection.add({
-	        		'index':index,
-	        		'form':model
-	    		});
+                //sort in descending order of creation time
+                group.sort(function (a, b) {
+                    return b.created_on - a.created_on;
+                });
 
-    		var el=$(this.itemTemplate({
-            	'item':model.toJSON(),
-            	'group':group,
-            	'titleTemplate':this.titleTemplate,
-            	'menuTemplate':this.menuTemplate
-        	}));
+                //replace the form model in the current proxy model
+                if (proxyModel.length) {
+                    proxyModel[0].set('form', model);
+                } else {
+                    //add a new model to the proxy collection
+                    this.proxyCollection.add({
+                        'index': index,
+                        'form': model
+                    });
+                }
 
-    		//replace the placeholder with the real item
-            $(item).replaceWith(el);
-       },
+                el = $(this.itemTemplate({
+                    'item': model.toJSON(),
+                    'group': group,
+                    'titleTemplate': this.titleTemplate,
+                    'menuTemplate': this.menuTemplate
+                }));
 
-        insert:function(e)
-        {
-        	el=$(e.currentTarget); //e.target could be a span inside an <a> element
+                //replace the placeholder with the real item
+                $(item).replaceWith(el);
 
-        	var id=el.attr('data-form-id');
-        	var model=this.collection.get(id);
+                return true;
+            },
 
-        	if (!model)
-        		return false;
-			var item=el.parent('li').clone();
-        	this.$('#study-forms').append(item);
+            insert: function (e) {
+                var el = $(e.currentTarget),            //e.target could be a span inside an <a> element
+                    id = el.attr('data-form-id'),
+                    model = this.collection.get(id),
+                    item = el.parent('li').clone();
 
-        	this.replace(item,item.index(),id);
+                if (!model) {
+                    return false;
+                }
 
-        	//prevent the browser from changing the page
-        	e.preventDefault();
-        	return false;
-        },
+                this.$('#study-forms').append(item);    //append item to list of forms in the study
+                this.replace(item, item.index(), id);   //replace the item
+                e.preventDefault();                     //prevent the browser from changing the page
 
-        removeItem:function(item)
-        {
-        	console.log('Removing item',item);
-        },
+                return false;
+            },
 
-        sortStarted:function(e,ui)
-        {
-        	this.sortStartedAt=ui.item.index();
-        },
+            removeItem: function (item) {
+                console.log('Removing item', item);
+            },
 
-        sortEnded:function(e,ui)
-        {
-        	this.sortStoppedAt=ui.item.index();
-        },
+            sortStarted: function (e, ui) {
+                this.sortStartedAt = ui.item.index();
+            },
 
-        updateIndexes:function(e,ui)
-        {
-			var from=this.sortStartedAt;
-			var to=this.sortStoppedAt;
+            sortEnded: function (e, ui) {
+                this.sortStoppedAt = ui.item.index();
+            },
 
-			//console.log('Initial: ',from,to);
+            /**
+             * @callback with 2 parameters: e:Event and ui:JqueryUI
+             */
+            updateIndexes: function () {
+                var from = this.sortStartedAt,
+                    to = this.sortStoppedAt;
 
-        	//var new_index=ui.item.index();
-        	//var model=this.proxyCollection.where({'form-id':ui.item.attr('data-form-id')});
+                this.proxyCollection.each(function (item) {
+                    var idx = item.get('index');
 
-        	/* TODO: this function doesn't work properly for now. */
-        	this.proxyCollection.each(function(item){
-				var idx=item.get('index');
+                    if (from >= to) {                           //if an item was moved up
+                        if (idx === from) {
+                            item.set('index', to);              //change index to destination
+                        } else if (idx >= to && idx < from) {
+                            item.set('index', idx + 1);         //all items in between are incremented
+                        }
+                                                                //other elements are ignored
+                    } else {                                    //if an item was moved down
+                        if (idx === from) {
+                            item.set('index', to);
+                        } else if (idx <= to && idx > from) {
+                            item.set('index', idx - 1);
+                        }
+                    }
+                });
 
-				//if an item was moved up
-				if (from>=to)
-				{
-					//change index to destination
-					if (idx==from)
-						item.set('index',to);
-					//all items in between are incremented
-					else if (idx>=to && idx<from)
-						item.set('index',idx+1);
+                this.proxyCollection.sort({silent: true});
 
-					//other elements are ignored
-				}
-				//if an item was moved down
-				else
-				{
-					if (idx==from)
-						item.set('index',to);
-					else if (idx<=to && idx>from)
-						item.set('index',idx-1);
-				}
-        	});
+                console.log(from, to, this.proxyCollection.map(function (item) {
+                    var form = item.get('form');
+                    return item.get('index') + ':' + form.get('code') + '/' + form.get('version');
+                }));
 
-        	this.proxyCollection.sort({silent:true});
+                this.sortStartedAt = -1;
+                this.sortStoppedAt = -1;
+            },
 
-			console.log(from,to,this.proxyCollection.map(function(item){
-				var form=item.get('form');
-        		return item.get('index')+':'+form.get('code')+'/'+form.get('version');
-        	}));
+            getModel: function () {
+                return this.proxyCollection;
+            },
 
-        	this.sortStartedAt=-1;
-        	this.sortStoppedAt=-1;
-        },
+            getForms: function () {
+                //convert all results to JSON
+                return this.proxyCollection.map(function (item) {
+                    return item.get('form').toJSON();
+                });
+            },
 
-        getModel:function()
-        {
-        	return this.proxyCollection;
-        },
+            onMenuItemSelect: function (e) {
+                var el = $(e.currentTarget),
+                    id = el.attr('data-form-id'),
+                    item = el.parents('li.active.dropdown');
 
-        getForms:function()
-        {
-        	//convert all results to JSON
-			return this.proxyCollection.map(function(item){
-					return item.get('form').toJSON()
-			});
-        },
+                this.replace(item, item.index(), id);
 
-        onMenuItemSelect:function(e){
-        	var el=$(e.currentTarget);
+                e.preventDefault();
 
-        	var id=el.attr('data-form-id');
-			var item=el.parents('li.active.dropdown');
+                return false;
+            },
 
-			this.replace(item,item.index(),id);
+            onDragOut: function (e, ui) {
+                console.log('drag out: adding class');
+                $(ui.helper).find('a.dropdown').addClass('build-form-remove');
+                $(ui.helper).on('mouseup', $.proxy(this.onDragStop, this));
+            },
 
-			e.preventDefault();
-			return false;
-        },
+            onDragIn: function (e, ui) {
+                console.log('drag in: removing class');
+                $(ui.helper).find('a.dropdown').removeClass('build-form-remove');
+            },
 
-        onDragOut:function(e,ui)
-        {
-        	console.log('drag out: adding class');
-        	$(ui.helper).find('a.dropdown').addClass('build-form-remove');
-        	$(ui.helper).on('mouseup',$.proxy(this.onDragStop,this));
-        },
+            onDragStop: function (e) {
+                var item = $(e.currentTarget),
+                    handle = item.children('a.dropdown');
 
-        onDragIn:function(e,ui)
-        {
-        	console.log('drag in: removing class');
-			$(ui.helper).find('a.dropdown').removeClass('build-form-remove');
-        },
+                item.off('mouseup');
 
-        onDragStop:function(e)
-        {
-        	var item=$(e.currentTarget);
-        	item.off('mouseup');
+                if (handle.hasClass('build-form-remove')) {
+                    handle.removeClass('build-form-remove');
+                    this.removeItem(item);
+                }
+            }
+        });
 
-        	var handle=item.children('a.dropdown');
-
-    		if (handle.hasClass('build-form-remove'))
-    		{
-    			handle.removeClass('build-form-remove');
-    			this.removeItem(item);
-    		}
-        }
-    });
-
-}); //define
+    }); //define

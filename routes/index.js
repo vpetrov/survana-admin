@@ -1,76 +1,82 @@
-var path=require('path');
-var async=require('async');
+var path = require('path');
+var async = require('async');
 
-var study_blacklist={
-    '_id':0,
-    'keys':0
+var study_blacklist = {
+    '_id': 0,
+    'keys': 0
 };
 
-var form_blacklist={
-    '_id':0
+var form_blacklist = {
+    '_id': 0
 };
 
-exports.index=function(req,res,next)
-{
-	var len=req.originalUrl.length;
-    var studies=[];
-    var forms=[];
+exports.index = function (req, res, next) {
+    "use strict";
 
-	//make sure the browser is using a trailing slash
-	if (req.originalUrl[len-1]!=='/')
-		return res.redirect(req.originalUrl+'/');
+    var len = req.originalUrl.length,
+        studies = [],
+        forms = [];
 
-	async.waterfall([
-		//get the 'study' collection
-		function getCollection(next2)
-        {
-			req.app.db.collection('study',next2)
-		},
+    //make sure the browser is using a trailing slash
+    if (req.originalUrl[len - 1] !== '/') {
+        res.redirect(req.originalUrl + '/');
+        return;
+    }
 
-		//find all study documents, prevent _id from showing up
-		function findAllStudies(col,next2)
-        {
-			col.find({},study_blacklist).toArray(next2);
-		},
+    async.waterfall({
+        //get the 'study' collection
+        'getCollection': function (next2) {
+            req.app.db.collection('study', next2);
+        },
+
+        //find all study documents, prevent _id from showing up
+        'findAllStudies': function (col, next2) {
+            col.find({}, study_blacklist).toArray(next2);
+        },
 
         //get the 'form' collection
-        function getFormCollection(result,next2)
-        {
-            studies=result;
-            req.app.db.collection('form',next2)
+        'getFormCollection': function (result, next2) {
+            studies = result;
+            req.app.db.collection('form', next2);
         },
 
         //find all form documents, prevent '_id' from showing up
-        function getForms(col,next2)
-        {
-            col.find({},form_blacklist).toArray(next2);
+        'getForms': function (col, next2) {
+            col.find({}, form_blacklist).toArray(next2);
         },
 
         //store the dataset for later
-        function formResults(result,next2)
-        {
-            forms=forms.concat(result);
+        'formResults': function (result, next2) {
+            forms = forms.concat(result);
 
-            next2(null,studies,forms);
+            next2(null, studies, forms);
         }
-    ],
+    },
 
-    //render the index page with the form and study datasets
-    function dislayPage(err,studies,forms)
-    {
-        if (err)
-            return next(err);
+        //render the index page with the form and study datasets
+        function dislayPage(err, studies, forms) {
+            var publishers = req.app.config.publishers,
+                serverNames = [],
+                i;
 
-        var server_names=[];
+            if (err) {
+                next(err);
+                return;
+            }
 
-        for (var i in req.app.config.publishers)
-            server_names.push(i);
+            if (publishers) {
+                for (i in publishers) {
+                    if (publishers.hasOwnProperty(i)) {
+                        serverNames.push(i);
+                    }
+                }
+            }
 
-        res.render('index',{
-            config:req.app.config,
-            forms:forms,
-            studies:studies,
-            publishers:server_names
+            res.render('index', {
+                config: req.app.config,
+                forms: forms,
+                studies: studies,
+                publishers: serverNames
+            });
         });
-    });
-}
+};

@@ -353,7 +353,7 @@
                     <ul class="nav nav-list">
                         <li class="nav-header">Menu</li>
                         <li class="active"><a href="#" onclick="return false">Details</a></li>
-                        <% if (study.published) { %>
+                        <% if (study.publishers.length) { %>
                             <li><a href="#" onclick="return false">Responses</a></li>
                         <% } %>
                     </ul>
@@ -417,7 +417,7 @@
                         <% var servers=_.difference(publishers,study.publishers); %>
 
                         <% if (servers.length) { %>
-                            <div class="btn-group">
+                            <div class="btn-group inline pull-left">
                                 <button class="btn btn-primary btn-medium btn-study-publish"
                                         data-publisher="<%= servers[0] %>" data-loading-text="Publishing...">
                                     <i class="icon-globe icon-white"></i>
@@ -445,6 +445,49 @@
                                 </ul>
                             </div>
                         <% } %>
+
+                        <% if (!study.publishers.length) { %>
+                        <button id='btn-study-edit' class="btn btn-warning btn-medium" style="margin-left:5px">
+                            <i class="icon-edit icon-white"></i> Edit
+                        </button>
+                        <% } else { %>
+                            <button id='btn-study-fork' class="btn btn-warning btn-medium" style="margin-left:5px">
+                                <i class="icon-random icon-white"></i> Fork
+                            </button>
+                        <% } %>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id='tpl-study-edit' type='text/template'>
+    <div class="container">
+        <!-- left menu -->
+        <div class="row">
+
+            <!-- sidebar -->
+            <div id='sidebar' class="span2">
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">Menu</li>
+                        <li class="active"><a href="#">Details</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- main container -->
+            <div class="span6">
+                <div class="container">
+                    <div class="row span6" id="messages"></div>
+                    <div class="row span6">
+                        <div class="page-header">
+                            <h1>Edit <%=title%>
+                                <small>// hello</small>
+                            </h1>
+                        </div>
                     </div>
                 </div>
             </div>

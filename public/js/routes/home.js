@@ -6,22 +6,24 @@ define([
     function ($, HomeView, StudyList) {
         "use strict";
 
+        var cache = {};
+
         return function (options) {
             var store = options.store;
 
-            if (!this.homeView) {
-                this.homeView = new HomeView({
-                    collection:         store.forms,
-                    study_collection:   store.studies
+            if (!cache.homeView) {
+                cache.homeView = new HomeView({
+                    collection: store.forms,
+                    study_collection: store.studies
                 });
 
-                this.homeView.render();
+                cache.homeView.render();
             } else {
-                this.homeView.delegateEvents();
+                cache.homeView.delegateEvents();
             }
 
             //set content
-            $('#content').html(this.homeView.el);
+            $('#content').html(cache.homeView.el);
 
             //TODO: update navigation
         };

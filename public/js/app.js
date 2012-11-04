@@ -1,28 +1,29 @@
 define([
-			'jquery',
-			'backbone',
-			'models/form/list',
-			'models/study/list',
-			'routes'
-		],
-function($,Backbone,FormList,StudyList,Routes)
-{
-		var store={};
+    'jquery',
+    'backbone',
+    'models/form/list',
+    'models/study/list',
+    'routes'
+],
+    function ($, Backbone, FormList, StudyList, Routes) {
+        "use strict";
 
-	    //Init all models
-	    store.forms=new FormList();
-	    store.studies=new StudyList();
-        store.publishers=$.parseJSON($('#store-publishers').html());
+        var store = {};
 
-	    //reset models
-	    store.forms.reset($.parseJSON($('#store-forms').html()));
-	    store.studies.reset($.parseJSON($('#store-studies').html()));
+        //Init all models
+        store.forms = new FormList();
+        store.studies = new StudyList();
+        store.publishers = $.parseJSON($('#store-publishers').html());
 
-    console.log('store publishers',store.publishers);
-	    Routes.store=store;
+        //reset models
+        store.forms.reset($.parseJSON($('#store-forms').html()));
+        store.studies.reset($.parseJSON($('#store-studies').html()));
 
-	    Backbone.View.prototype.router=Routes;
+        console.log('store publishers', store.publishers);
+        Routes.store = store;
 
-	    Backbone.history.start();
+        Backbone.View.prototype.router = Routes;
 
-}); //define
+        Backbone.history.start();
+
+    }); //define
