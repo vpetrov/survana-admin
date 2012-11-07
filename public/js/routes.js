@@ -12,7 +12,7 @@ define([
     function ($, Backbone, Home, CreateStudy, ViewStudy, EditStudy, CreateForm, ViewForm, EditForm) {
         "use strict";
 
-        return Backbone.Router.extend({
+        return new (Backbone.Router.extend({
 
             store: {},
 
@@ -72,6 +72,6 @@ define([
                     store: this.store
                 });
             }
-        });
+        }))();
 
     }); //define

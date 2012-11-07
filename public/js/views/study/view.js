@@ -118,7 +118,7 @@ define([
 
                             view.enablePublishButton();
 
-                            Alert.modal(message);
+                            Alert.show(message);
                         }
                     });
             },

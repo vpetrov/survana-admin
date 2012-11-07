@@ -15,5 +15,8 @@
         "vows":     "0.6.x",
         "request":  "2.x.x"
 
+    },
+    "scripts": {
+        "test": "vows --spec test/*"
     }
 }

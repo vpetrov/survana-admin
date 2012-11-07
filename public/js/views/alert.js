@@ -7,7 +7,7 @@ define([
     function ($, _, Backbone) {
         "use strict";
 
-        return Backbone.View.extend({
+        return new (Backbone.View.extend({
             container: '#messages',
             template: _.template($('#tpl-alert').html()),
             modalTemplate: _.template($('#tpl-modal-alert').html()),
@@ -44,6 +44,6 @@ define([
 
                 $(this.el).children('.modal').modal(); //bootstrap.modal()
             }
-        });
+        }))();
 
     }); //define

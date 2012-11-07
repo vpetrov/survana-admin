@@ -18,7 +18,6 @@ exports.create = function (req, res, next) {
     "use strict";
 
     var db = req.app.db,
-        col = null,
         form = req.body,
         gid = form.gid;
 
@@ -28,66 +27,53 @@ exports.create = function (req, res, next) {
 
     form.data = JSON.parse(form.data);
 
-    async.waterfall({
+    async.auto({
 
-        'getCollection': function (next2) {
+        'formCollection': [function (next2) {
             db.collection('form', next2);
-        },
+        }],
 
-        'generateUniqueId': function (collection, next2) {
-            col = collection;
-            db.uniqueId(collection, 'id', next2);
-        },
+        'uniqueId': ['formCollection', function (next2, result) {
+            db.uniqueId(result.formCollection, 'id', next2);
+        }],
 
-        'setId': function (uniqueId, next2) {
-            form.id = uniqueId;
+        'uniqueGroupId': ['formCollection', function (next2, result) {
+            db.uniqueId(result.formCollection, 'id', next2);
+        }],
+
+        'siblingForm': [ 'formCollection', function (next2, result) {
+            if (gid !== 0) {
+                result.formCollection.findOne({'gid': gid}, next2);
+            } else {
+                next2(null, false);
+            }
+
+        }],
+
+        'formWithId': ['uniqueId', function (next2, result) {
+            form.id = result.uniqueId;
             form.created_on = (new Date()).valueOf();
 
             next2(null, form);
-        },
+        }],
 
-        //S1 and S2 are mutually exclusive. 'gid' is used as guard.
-        'S1_generateGroupId': function (form, next2) {
-            if (gid === '0') {
-                db.uniqueId(col, 'id', next2);
+        'formWithGroup': ['uniqueId', 'uniqueGroupId', 'siblingForm', function (next2, result) {
+
+            if (result.siblingForm) {
+                form.group = result.siblingForm.group;
+            } else if (gid !== 0) {
+                next2(null, new Error('Group ID ' + gid + ' not found.'));
             } else {
-                next2(null, form);  //does the form have a group already?
-            }
-        },
-
-        'S1_setGroup': function (uniqueId, next2) {
-            if (gid === '0') {
-                form.gid = uniqueId;
+                form.gid = result.uniqueId;
                 form.group = form.title;
-
-                next2(null, form);
-            } else {
-                next2(null, form);
             }
-        },
 
-        'S2_findGroup': function (form, next2) {
-            if (gid === '0') {
-                next2(null, form);
-            } else {
-                col.findOne({'gid': gid}, next2);
-            }
-        },
+            next2(null, form);
+        }],
 
-        'S2_updateGroup': function (result, next2) {
-            if (gid === '0') {
-                next2(null, form);
-            } else if (!result) {
-                next2(new Error('Group id ' + gid + ' not found.'));
-            } else {
-                form.group = result.group;
-                next2(null, form);
-            }
-        },
-
-        'addForm': function (form, next2) {
-            col.insert(form, {safe: true, fsync: true}, next2);
-        }
+        'addForm': ['formCollection', 'formWithId', 'formWithGroup', function (next2, result) {
+            result.formCollection.insert(form, {safe: true, fsync: true}, next2);
+        }]
     },
 
         function processResult(err) {
@@ -103,32 +89,28 @@ exports.create = function (req, res, next) {
 
 /** UPDATE
  */
-exports.update = function (req, res) {
+exports.update = function (req, res, next) {
     "use strict";
 
     var db = req.app.db,
         form = req.body,
-        formId = req.params.id,
-        col;
+        formId = req.params.id;
 
     if (typeof (form) !== 'object') {
         throw 'Invalid request';
     }
 
-    //TODO: validate input data (malicious js functions?)
+    async.auto({
+        'formCollection': [function (next2) {
+            db.collection('form', next2);
+        }],
 
-    async.waterfall({
-        'getCollection': function (next) {
-            db.collection('form', next);
-        },
+        'serverForm': ['formCollection', function (next2, result) {
+            result.formCollection.findOne({'id': formId}, next2);
+        }],
 
-        'getExistingForm': function (collection, next) {
-            col = collection;
-            col.findOne({'id': formId}, next);
-        },
-
-        'updateForm': function (item, next) {
-            if (!item) {
+        'updateForm': ['formCollection', 'serverForm', function (next2, result) {
+            if (!result.serverForm) {
                 res.send('Form not found', HTTP_NOT_FOUND);
                 return;
             }
@@ -139,12 +121,13 @@ exports.update = function (req, res) {
             delete form.created_on;
 
             //perform db update
-            col.update({'id': formId}, {'$set': form}, {safe: true, fsync: true}, next);
-        }
+            result.formCollection.update({'id': formId}, {'$set': form}, {safe: true, fsync: true}, next2);
+        }]
     },
         function processResult(err) {
             if (err) {
-                throw err;
+                next(err);
+                return;
             }
 
             delete form._id;

@@ -13,9 +13,9 @@ var form_blacklist = {
 exports.index = function (req, res, next) {
     "use strict";
 
-    var len = req.originalUrl.length,
-        studies = [],
-        forms = [];
+    var app = req.app,
+        db = app.db,
+        len = req.originalUrl.length;
 
     //make sure the browser is using a trailing slash
     if (req.originalUrl[len - 1] !== '/') {
@@ -23,39 +23,31 @@ exports.index = function (req, res, next) {
         return;
     }
 
-    async.waterfall({
+    async.auto({
         //get the 'study' collection
-        'getCollection': function (next2) {
-            req.app.db.collection('study', next2);
-        },
-
-        //find all study documents, prevent _id from showing up
-        'findAllStudies': function (col, next2) {
-            col.find({}, study_blacklist).toArray(next2);
+        'studyCollection': function (next2) {
+            db.collection('study', next2);
         },
 
         //get the 'form' collection
-        'getFormCollection': function (result, next2) {
-            studies = result;
-            req.app.db.collection('form', next2);
+        'formCollection': function (next2) {
+            db.collection('form', next2);
         },
+
+        //find all study documents, prevent _id from showing up
+        'studies': ['studyCollection', function (next2, result) {
+            result.studyCollection.find({}, study_blacklist).toArray(next2);
+        }],
 
         //find all form documents, prevent '_id' from showing up
-        'getForms': function (col, next2) {
-            col.find({}, form_blacklist).toArray(next2);
-        },
-
-        //store the dataset for later
-        'formResults': function (result, next2) {
-            forms = forms.concat(result);
-
-            next2(null, studies, forms);
-        }
+        'forms': ['formCollection', function (next2, result) {
+            result.formCollection.find({}, form_blacklist).toArray(next2);
+        }]
     },
-
         //render the index page with the form and study datasets
-        function dislayPage(err, studies, forms) {
-            var publishers = req.app.config.publishers,
+        function dislayPage(err, result) {
+
+            var publishers = app.config.publishers,
                 serverNames = [],
                 i;
 
@@ -73,9 +65,9 @@ exports.index = function (req, res, next) {
             }
 
             res.render('index', {
-                config: req.app.config,
-                forms: forms,
-                studies: studies,
+                config: app.config,
+                forms: result.forms,
+                studies: result.studies,
                 publishers: serverNames
             });
         });
