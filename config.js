@@ -1,3 +1,11 @@
+/** config.js
+ *
+ * @author Victor Petrov <victor.petrov@gmail.com>
+ * @copyright (c) 2012, The Neuroinformatics Research Group at Harvard University.
+ * @copyright (c) 2012, The President and Fellows of Harvard College.
+ * @license New BSD License (see LICENSE file for details).
+ */
+
 exports.title = 'Survana Administration';
 
 //the first server listed is the default publishing server
