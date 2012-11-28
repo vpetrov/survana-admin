@@ -49,7 +49,7 @@ exports.routes = {
 
 exports.lib = {
     'backbone': 'lib/backbone/0.9.2',
-    'bootstrap': 'lib/bootstrap/2.1.1',
+    'bootstrap': 'lib/bootstrap/2.2.1',
     'jquery': 'lib/jquery/1.7.2',
     'jquery-ui': 'lib/jquery/ui/1.8.21',
     'require': 'lib/require/2.0.4',
