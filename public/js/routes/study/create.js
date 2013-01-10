@@ -21,6 +21,7 @@ define([
                 });
 
             createStudyView.render();
+            createStudyView.onShow();
 
             $('#content').html(createStudyView.el);
 

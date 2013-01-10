@@ -29,36 +29,59 @@ define([
 
             initialize: function (options) {
                 console.log('Initializing StudyFormsView', options);
-                _.bindAll(this, 'render', 'onItemInserted', 'getModel', 'getForms', 'sortStarted', 'sortEnded',
-                          'insert', 'onMenuItemSelect', 'onDragOut', 'onDragIn', 'onDragStop');
-
-                this.collection.on("change", this.render);
+                _.bindAll(this, 'render', 'onItemInserted', 'getModel', 'getForms', 'setForms', 'sortStarted',
+                          'sortEnded', 'insert', 'onMenuItemSelect', 'onDragOut', 'onDragIn', 'onDragStop', 'onShow');
 
                 //proxy model
                 this.proxyCollection = new FormListProxy();
+
+                if (options.forms) {
+                    this.setForms(options.forms);
+                }
+
+                this.collection.on("change", this.render);
+
+
                 //this.render(this.collection);
             },
 
             events: {
-                'click a[data-form-id]': 'onMenuItemSelect'
+                'click a[data-form-id][data-form-version]': 'onMenuItemSelect'
             },
 
             render: function () {
-                var items;
+                console.log('render study/forms.js');
+                var i,
+                    items = [],
+                    groups = {};
 
-                if (this.proxyCollection.length) {
-                    items = this.proxyCollection.toJSON();
-                } else {
-                    items = [];
+                function compare1(a, b) {
+                    return b.created_on - a.created_on;
+                }
+
+                items = this.getForms();
+
+                for (i = 0; i < items.length; i += 1) {
+                    groups[items[i].gid] = this.collection.where({'gid': items[i].gid}).map(function(form){
+                        return form.toJSON();
+                    });
                 }
 
                 //create template
                 $(this.el).html(this.template({
                     'items': items,
+                    'groups': groups,
                     'itemTemplate': this.itemTemplate,
                     'titleTemplate': this.titleTemplate,
-                    'menuTemplate': this.menuTemplate
+                    'menuTemplate': this.menuTemplate,
+                    'onlyPublished': true
                 }));
+
+                return this;
+            },
+
+            onShow: function () {
+                this.delegateEvents();
 
                 //sortable list properties
                 this.$('.sortable-list').sortable({
@@ -74,8 +97,6 @@ define([
 
                 //disable user select (conflicts with dragging)
                 $('.sortable-list').disableSelection();
-
-                return this;
             },
 
             onItemInserted: function (e, ui) {
@@ -135,7 +156,8 @@ define([
                     'item': model.toJSON(),
                     'group': group,
                     'titleTemplate': this.titleTemplate,
-                    'menuTemplate': this.menuTemplate
+                    'menuTemplate': this.menuTemplate,
+                    'onlyPublished': true
                 }));
 
                 //replace the placeholder with the real item
@@ -144,21 +166,17 @@ define([
                 return true;
             },
 
-            insert: function (e) {
-                var el = $(e.currentTarget),            //e.target could be a span inside an <a> element
-                    id = el.attr('data-form-id'),
-                    model = this.collection.get(id),
-                    item = el.parent('li').clone();
+            insert: function (id) {
+                console.log('inserting new form',id);
+                var model = this.collection.get(id),
+                    item = $('<li></li>');
 
                 if (!model) {
                     return false;
                 }
 
-                this.$('#study-forms').append(item);    //append item to list of forms in the study
+                this.$('.sortable-list').append(item);    //append item to list of forms in the study
                 this.replace(item, item.index(), id);   //replace the item
-                e.preventDefault();                     //prevent the browser from changing the page
-
-                return false;
             },
 
             removeItem: function (item) {
@@ -206,6 +224,8 @@ define([
                     return item.get('index') + ':' + form.get('code') + '/' + form.get('version');
                 }));
 
+                this.trigger('indexchange',from,to);
+
                 this.sortStartedAt = -1;
                 this.sortStoppedAt = -1;
             },
@@ -219,6 +239,24 @@ define([
                 return this.proxyCollection.map(function (item) {
                     return item.get('form').toJSON();
                 });
+            },
+
+            setForms: function (forms) {
+                var i,
+                    model;
+
+                for (i = 0; i < forms.length; i += 1) {
+                    model = this.collection.get(forms[i]);
+
+                    if (model) {
+                        this.proxyCollection.add({
+                            'index': i,
+                            'form': model
+                        }, {
+                            'silent': true
+                        });
+                    }
+                }
             },
 
             onMenuItemSelect: function (e) {

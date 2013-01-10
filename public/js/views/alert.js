@@ -19,14 +19,22 @@ define([
             container: '#messages',
             template: _.template($('#tpl-alert').html()),
             modalTemplate: _.template($('#tpl-modal-alert').html()),
+            modalFormTemplate: _.template($('#tpl-modal-form').html()),
+
+            modalFormSave:null,
 
             defaults: {
                 'message': 'An error has occurred. That\'s all we know.',
                 'title': 'Oops!'
             },
 
+            events: {
+                'click .modal-form-save': 'onModalFormSave',
+                'submit form': 'onModalFormSubmit'
+            },
+
             initialize: function () {
-                _.bindAll(this, 'show', 'modal');
+                _.bindAll(this, 'show', 'modal', 'form', 'onModalFormSave', 'onModalFormSubmit');
             },
 
             render: function () {
@@ -51,6 +59,50 @@ define([
                 $('body').append(this.el);
 
                 $(this.el).children('.modal').modal(); //bootstrap.modal()
+            },
+
+            /**
+             *
+             * @param data
+             * @param title
+             * @param onsave callback for the 'Save' button. If it returns false, the modal form is not closed.
+             */
+            form: function (formdata, title, onsave) {
+                var data = {
+                    'form': formdata || "",
+                    'title': title || this.defaults.title
+                };
+
+                $(this.el).html(this.modalFormTemplate(data));
+
+                $('body').append(this.el);
+
+                this.modalFormSave = onsave;
+
+                $(this.el).children('.modal').modal();
+            },
+
+            onModalFormSubmit: function (e) {
+
+                this.onModalFormSave(e);
+
+                e.preventDefault();
+                return false;
+            },
+
+            onModalFormSave: function (e) {
+                var data = $(this.el).find('form').serializeArray();
+
+                //attempt to save the form. if the save handler returns false, keep dialog on the screen
+                if (this.modalFormSave && (this.modalFormSave(data) === false)) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                //save succeeded, hide the modal dialog
+                $(e.currentTarget).parents('.modal').modal('hide');
+
+                return true;
             }
         }))();
 

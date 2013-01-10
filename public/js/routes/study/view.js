@@ -21,15 +21,16 @@ define([
 
             if (!_.has(cache, sid)) {
                 cache[sid] = new ViewStudyView({
-                    collection: store.forms,
+                    collection: store.studies,
+                    forms:      store.forms,
                     publishers: store.publishers,
                     model:      store.studies.get(sid)
                 });
 
                 cache[sid].render();
-            } else {
-                cache[sid].delegateEvents();
             }
+
+            cache[sid].onShow();
 
             $('#content').html(cache[sid].el);
         };

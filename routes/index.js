@@ -8,6 +8,7 @@
 
 var path = require('path');
 var async = require('async');
+var pkg = require('../package.json');
 
 var study_blacklist = {
     '_id': 0,
@@ -76,7 +77,8 @@ exports.index = function (req, res, next) {
                 config: app.config,
                 forms: result.forms,
                 studies: result.studies,
-                publishers: serverNames
+                publishers: serverNames,
+                pkg: pkg
             });
         });
 };

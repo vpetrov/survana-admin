@@ -22,40 +22,59 @@ define([
             template: _.template($('#tpl-form-list').html()),
             itemTemplate: _.template($('#tpl-form-list-item').html()),
 
-            clickHandler: null,
-
             initialize: function () {
 
-                _.bindAll(this, 'render', 'addItem', 'draggable');
+                _.bindAll(this, 'render', 'addItem', 'draggable', 'onClick');
 
                 this.collection.on("change reset", this.render);
                 this.collection.on("add", this.addItem);
             },
 
+            events: {
+                'click a[data-form-id]': 'onClick'
+            },
+
             render: function () {
+
+                var models = this.collection.where({'published': true}),
+                    items = _.map(models, function (model) { return model.toJSON(); });
+
+                    //where({'published': true}).toJSON();
                 $(this.el).html(this.template({
                     //group items by group_id
-                    'items': _.groupBy(this.collection.toJSON(), 'gid'),
-                    'itemTemplate': this.itemTemplate
+                    'items': _.groupBy(items, 'gid'),
+                    'itemTemplate': this.itemTemplate,
+                    'onlyPublished': true
                 }));
-                this.draggable();
-                this.addClickHandler();
+
                 return this;
+            },
+
+            onShow: function () {
+                this.draggable();
+                this.delegateEvents();
+            },
+
+            /**
+             * Click handler takes at most 3 params: clickHandler(form_id, click_el, e)
+             * @param e
+             */
+            onClick: function (e) {
+
+                this.trigger('formclick', $(e.currentTarget).attr('data-form-id'), e.currentTarget, e);
+
+                e.preventDefault();
+                return false;
             },
 
             addItem: function (newitem) {
                 this.$('#form-list').append(this.itemTemplate({
                     'id': newitem.get('id'),
-                    'group': newitem.get('group')
+                    'group': newitem.get('group'),
+                    'onlyPublished': true
                 }));
 
-                this.addClickHandler();
                 return this;
-            },
-
-            addClickHandler: function () {
-                console.log('registering click handler');
-                this.$('#form-list').find('a').click(this.clickHandler);
             },
 
             draggable: function () {
@@ -65,10 +84,6 @@ define([
                     connectToSortable: ".sortable-list",
                     delay: drag_delay
                 });
-            },
-
-            click: function (fn) {
-                this.clickHandler = fn;
             }
         });
 

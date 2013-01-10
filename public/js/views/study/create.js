@@ -1,5 +1,7 @@
 /** public/js/views/study/create.js
  *
+ * TODO: Merge with edit.js
+ *
  * @author Victor Petrov <victor.petrov@gmail.com>
  * @copyright (c) 2012, The Neuroinformatics Research Group at Harvard University.
  * @copyright (c) 2012, The President and Fellows of Harvard College.
@@ -22,14 +24,18 @@ define([
 
         return Backbone.View.extend({
             template: _.template($('#tpl-study-create').html()),
+            optionsTemplate: _.template($('#tpl-form-options').html()),
 
             formGroupView: null,
             studyFormsView: null,
 
+            overrides: [],
+
             initialize: function (options) {
                 console.log('Initializing Create Study View', options);
 
-                _.bindAll(this, 'onSubmit', 'onSubmitError', 'onValidationError');
+                _.bindAll(this, 'onSubmit', 'onShow', 'onSubmitError', 'onValidationError',
+                                'onFormMenuOptionsClick', 'onFormOptionsSave', 'onFormIndexChanged');
 
                 //left menu view
                 this.formGroupView = new FormGroupView({
@@ -40,13 +46,11 @@ define([
                 this.studyFormsView = new StudyFormsView({
                     collection: options.forms
                 });
-
-                //connect the two views
-                this.formGroupView.click(this.studyFormsView.insert);
             },
 
             events: {
-                'submit #create-study': 'onSubmit'
+                'submit form': 'onSubmit',
+                'click  a.form-menu-options':   'onFormMenuOptionsClick'
             },
 
             render: function () {
@@ -55,12 +59,17 @@ define([
 
                 $(this.el).html(this.template());
 
-                $(this.el).find('#sidebar-form-groups').html(this.formGroupView.el);
-                $(this.el).find('#study-forms-container').html(this.studyFormsView.el);
-
-                console.log('form element', $(this.el).find('#create-study'));
+                $(this.el).find('.sidebar-form-groups').html(this.formGroupView.el);
+                $(this.el).find('.study-forms-container').html(this.studyFormsView.el);
 
                 return this;
+            },
+
+            onShow: function () {
+                this.formGroupView.onShow();
+                this.studyFormsView.onShow();
+
+                this.formGroupView.on('formclick', this.studyFormsView.insert);
             },
 
             onSubmit: function (e) {
@@ -84,6 +93,8 @@ define([
                 data.forms = _.map(forms, function (item) {
                     return item.id;
                 });
+
+                data.overrides = this.overrides;
 
                 try {
                     study = new Study(data);
@@ -127,6 +138,76 @@ define([
                 }
 
                 Alert.show(msg);
+            },
+
+            onFormMenuOptionsClick: function (e) {
+                var data,
+                    index = $(e.currentTarget).parentsUntil(this.el, 'li.active').index(); //order in the form list
+
+                data = {
+                    'index': index,
+                    'options': this.overrides[index]
+                };
+
+                Alert.form(this.optionsTemplate(data), "Form Options", this.onFormOptionsSave);
+
+                e.preventDefault();
+                return false;
+            },
+
+            /** Callback from a modal form.
+             * @param data The form data
+             * @return {Boolean} True to close the modal form, False to keep it open
+             */
+            onFormOptionsSave: function (data) {
+                var index = null,
+                    options = {};
+
+                if (!data || !data.length) {
+                    return false;
+                }
+
+                //copy the data from the array into an object
+                _.each(data, function (item) {
+                    if (item.name === '_index') {
+                        index = item.value;
+                        return;
+                    }
+
+                    if (item.value.toString().length) {
+                        options[item.name] = item.value;
+                    }
+                });
+
+                if (index !== null) {
+                    this.overrides[index] = options;
+                }
+
+                return true;
+            },
+
+            /** Handler for when the FormGroupView detects that the user has reordered the forms
+             * @param from  Source index
+             * @param to    Destination index
+             */
+            onFormIndexChanged: function (from, to) {
+                var item;
+
+                if (from === to) {
+                    return;
+                }
+
+                //swap study overrides
+                item = this.overrides[from];
+
+                this.overrides.splice(from, 1);
+
+                //make sure the array has enough elements up to the 'to' position
+                while (this.overrides.length < to) {
+                    this.overrides.push(null);
+                }
+
+                this.overrides.splice(to, 0, item);
             }
         });
 

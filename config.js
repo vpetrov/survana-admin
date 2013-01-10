@@ -53,8 +53,8 @@ exports.lib = {
     'jquery': 'lib/jquery/1.7.2',
     'jquery-ui': 'lib/jquery/ui/1.8.21',
     'require': 'lib/require/2.0.4',
-    //'underscore':'lib/underscore/1.3.3'
-    'underscore': 'lib/lodash/0.4.2',
+    //'underscore':'lib/underscore/1.4.3',
+    'underscore': 'lib/lodash/0.10',
     'ace': 'lib/ace/0.2.0'
 };
 

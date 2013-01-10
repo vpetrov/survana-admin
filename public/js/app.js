@@ -27,7 +27,6 @@ define([
         store.forms.reset($.parseJSON($('#store-forms').html()));
         store.studies.reset($.parseJSON($('#store-studies').html()));
 
-        console.log('store publishers', store.publishers);
         Routes.store = store;
 
         Backbone.View.prototype.router = Routes;

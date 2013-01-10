@@ -10,18 +10,24 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'views/alert'
+    'models/study',
+    'views/alert',
+    'errors'
 ],
-    function ($, _, Backbone, Alert) {
+    function ($, _, Backbone, Study, Alert, Errors) {
         "use strict";
 
         return Backbone.View.extend({
             template: _.template($('#tpl-study-view').html()),
+            formCollection: null,
             forms: [],
             publishers: [],
 
+
             initialize: function (options) {
-                _.bindAll(this, 'render', 'publish', 'onPublishClick', 'disablePublishButton', 'onEditClick');
+                //WARNING: If the list contains a bad function name, this code will fail in Safari and Firefox.
+                _.bindAll(this, 'render', 'publish', 'onPublishClick', 'onEditClick',
+                                'onForkClick');
 
                 //TODO: fetch study from the server (back button issue)
                 if (!this.model) {
@@ -29,31 +35,33 @@ define([
                     return;
                 }
 
+                this.formCollection = options.forms;
                 this.publishers = options.publishers;
-
-                this.forms = [];
-
-                //find all form models by the ID specified in the Study (convert model to json)
-                _.each(this.model.get('forms'), function (form_id) {
-                    var f = this.collection.get(form_id);
-
-                    if (f) {
-                        console.log('found study form ' + form_id, f.toJSON());
-                        this.forms.push(f.toJSON());
-                    }
-                }, this);
 
                 this.model.on('change', this.render);
             },
 
             events: {
                 'click .btn-study-publish': 'onPublishClick',
-                'click #btn-study-edit': 'onEditClick'
+                'click .btn-study-edit': 'onEditClick',
+                'click .btn-study-fork': 'onForkClick'
             },
 
             render: function () {
                 console.log('rendering study view');
                 var model = this.model.toJSON();
+
+                this.forms = [];
+
+                //find all form models by the ID specified in the Study (convert model to json)
+                _.each(this.model.get('forms'), function (form_id) {
+                    var f = this.formCollection.get(form_id);
+
+                    if (f) {
+                        console.log('found study form ' + form_id, f.toJSON());
+                        this.forms.push(f.toJSON());
+                    }
+                }, this);
 
                 model.forms = this.forms;
 
@@ -63,6 +71,11 @@ define([
                 }));
 
                 return this;
+            },
+
+            onShow: function () {
+                this.delegateEvents();
+                $(this.el).find("[rel=tooltip]").tooltip();
             },
 
             enablePublishButton: function (enable) {
@@ -131,6 +144,37 @@ define([
                     });
             },
 
+            fork: function () {
+                var newmodel = new Study(),
+                    data = this.model.toJSON(),
+                    router = this.router,
+                    studies = this.collection,
+                    el = this.$el;
+
+                //remove properties that shouldn't be present in a fork of the current study
+                delete data.id;
+                delete data.created_on;
+                delete data.publishers;
+                delete data.urls;
+
+                try {
+                    newmodel.save(data, {
+                        'wait': true,
+                        'success': function (model, updates) {
+                            model.set(updates, {silent: true});
+                            studies.add(model);
+
+                            el.find('#btn-study-fork').button('reset');
+
+                            router.navigate('study/' + model.get('id'), {'trigger': true});
+                        },
+                        'error': this.onSubmitError
+                    });
+                } catch (err) {
+                    console.error(err, err.message);
+                }
+            },
+
             onPublishClick: function (e) {
                 //close the menu if the menu was used to publish the study
                 if ($(e.currentTarget).attr('href')) {
@@ -151,6 +195,20 @@ define([
                 this.router.navigate('study/' + this.model.get('id') + '/edit', {trigger: true});
                 e.preventDefault();
                 return false;
+            },
+
+            onForkClick: function (e) {
+
+                this.$el.find('#btn-study-fork').attr('disabled', 'disabled');
+
+                this.fork();
+
+                e.preventDefault();
+                return false;
+            },
+
+            onSubmitError: function (model, result, caller) {
+                Errors.onSubmit(this, model, result, caller);
             }
         });
 

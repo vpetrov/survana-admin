@@ -22,12 +22,13 @@ define([
             if (!_.has(cache, sid)) {
                 cache[sid] = new EditStudyView({
                     collection: store.studies,
-                    model: store.studies.get(sid)
+                    model: store.studies.get(sid),
+                    forms: store.forms
                 });
                 cache[sid].render();
-            } else {
-                cache[sid].delegateEvents();
             }
+
+            cache[sid].onShow();
 
             $('#content').html(cache[sid].el);
         };

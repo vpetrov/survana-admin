@@ -67,7 +67,7 @@ define([
                             model.set(updates, {silent: true});
                             forms.add(model);
 
-                            router.navigate('study/create', {'trigger': true});
+                            router.navigate('form/' + model.get('id'), {'trigger': true});
                         },
 
                         'error': this.onSubmitError

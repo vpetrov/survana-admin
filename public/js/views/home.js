@@ -7,44 +7,62 @@
  */
 
 define([
-			'jquery',
-			'underscore',
-			'backbone',
-			'views/study/list'
-		],
-function($,_,Backbone,StudyListView)
-{
-    return Backbone.View.extend({
-    	template:_.template($('#tpl-home').html()),
-    	welcomeTemplate:_.template($('#tpl-welcome').html()),
-    	studyListView:null,
-    	studyCollection:[],
+    'jquery',
+    'underscore',
+    'backbone',
+    'views/study/list',
+    'views/form/list'
+],
+    function ($, _, Backbone, StudyListView, FormListView) {
+        "use strict";
 
-    	initialize:function(options){
+        return Backbone.View.extend({
+            template: _.template($('#tpl-home').html()),
+            welcomeTemplate: _.template($('#tpl-welcome').html()),
+            studyCollection: [],
+            studyListView: null,
 
-    		this.studyCollection=options.study_collection;
 
-    		this.studyListView=new StudyListView({
-    			collection:this.studyCollection
-			});
-    	},
+            formListView: null,
 
-    	events:{
-    		//event listeners go here
-    	},
+            initialize: function (options) {
 
-    	render:function(){
-    		$(this.el).html(this.template());
-    		this.studyListView.render();
+                this.studyCollection = options.study_collection;
 
-    		//display a list of all studies
-    		if (this.studyCollection && this.studyCollection.length)
-    			$(this.el).find('#main-content').html(this.studyListView.el);
-    		else
-    		//display a welcome page
-    			$(this.el).find('#main-content').html(this.welcomeTemplate());
-    		return this;
-    	},
-    });
 
-}); //define
+                this.studyListView = new StudyListView({
+                    collection: this.studyCollection
+                });
+
+                this.formListView = new FormListView({
+                    collection: this.collection
+                });
+
+                this.studyCollection.on('change',this.render);
+            },
+
+            events: {
+                //event listeners go here
+            },
+
+            render: function () {
+                $(this.el).html(this.template());
+
+                this.studyListView.render();
+                this.formListView.render();
+
+                //display a list of all studies
+                if (this.studyCollection && this.studyCollection.length) {
+                    this.$el.find('#home-study-list').html(this.studyListView.el);
+                    this.$el.find('#home-form-list').html(this.formListView.el);
+
+                } else {
+                    //display a welcome page
+                    this.$el.find('#main-content').html(this.welcomeTemplate());
+                }
+
+                return this;
+            }
+        });
+
+    }); //define

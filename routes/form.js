@@ -33,7 +33,10 @@ exports.create = function (req, res, next) {
         throw "Invalid request";
     }
 
-    form.data = JSON.parse(form.data);
+    //when forking, the data property is sent as JSON
+    if (typeof (form.data) === 'string') {
+        form.data = JSON.parse(form.data);
+    }
 
     async.auto({
 

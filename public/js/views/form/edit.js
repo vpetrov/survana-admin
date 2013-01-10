@@ -20,12 +20,17 @@ define([
 
         return Backbone.View.extend({
             template: _.template($('#tpl-form-edit').html()),
+            statusTemplate: _.template($('#tpl-code-editor-message').html()),
             editor: null,
+            saving: false,
 
             initialize: function (options) {
                 console.log('Initializing Edit Form View', options);
 
-                _.bindAll(this, 'submit', 'onCancelClick', 'onSaveClick', 'onSubmitError', 'onValidationError');
+                _.bindAll(this, 'submit', 'onCancelClick', 'onSaveClick', 'onSubmitError', 'onValidationError',
+                                'onSaveShortcut', 'setSaveStatus');
+
+                $(window).keydown($.proxy(this.onShortcut,this));
             },
 
             events: {
@@ -49,6 +54,75 @@ define([
                 return this;
             },
 
+            preview: function () {
+                var form = this.$el.find('form.preview');
+
+                form.find('input').val(JSON.stringify(this.model.toJSON()));
+
+                //register the submit handler
+                form.submit(function () {
+                    window.open('', 'formpreview');
+                    this.target = 'formpreview';
+                });
+
+                //submit the form
+                form.submit();
+            },
+
+            setSaveStatus: function (status, message) {
+                var icon = "";
+
+                //bootstrap icon-* value
+                if (status === null) {
+                    icon = 'retweet';
+                } else if (status === false) {
+                    icon = 'warning-sign';
+                } else if (status === true) {
+                    icon = 'ok-sign';
+                }
+
+                this.$el.find('.code-editor-message').html(this.statusTemplate({
+                    'icon': icon,
+                    'message': message
+                }));
+            },
+
+            onShortcut: function (event) {
+
+                var found = false,
+                    context = this;
+
+
+                if (((event.which === 115) || (event.which === 83)) && (event.ctrlKey || event.metaKey)) {  //Save
+                    if (!context.saving) {
+                        context.saving = true;
+
+                        context.setSaveStatus(null, 'Saving ...');
+
+                        this.submit(function (result) {
+                            context.saving = false;
+                            if (result) {
+                                context.setSaveStatus(true, "Saved at " + (new Date()).toLocaleTimeString());
+                            } else {
+                                context.setSaveStatus(false, "Save failed");
+                            }
+                        });
+                    }
+                    found = true;
+
+                } else if ((event.which === 80) && (event.ctrlKey || event.metaKey)) {                      //Preview
+                    this.preview();
+                    found = true;
+                }
+
+                if (found) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                return true;
+            },
+
             onSaveClick: function (e) {
                 this.submit();
 
@@ -63,11 +137,12 @@ define([
                 return false;
             },
 
-            submit: function () {
+            submit: function (callback) {
 
                 var data = {},
                     router = this.router,
-                    form = this.$el.find('form');
+                    form = this.$el.find('form'),
+                    context = this;
 
                 //copy all form values into the study object
 
@@ -90,12 +165,22 @@ define([
                     this.model.save(data, {
                         'wait': true,
                         'success': function (model, updates) {
-                            model.set(updates, {silent: true});
+                            model.set(updates);
 
-                            router.navigate('form/' + model.get('id'), {'trigger': true});
+                            if (callback) {
+                                callback(true, model);
+                            } else {
+                                router.navigate('form/' + model.get('id'), {'trigger': true});
+                            }
                         },
 
-                        'error': this.onSubmitError
+                        'error': function () {
+                            if (callback) {
+                                callback.apply(context, [false]);
+                            } else {
+                                this.onSubmitError.apply(context, [false]);
+                            }
+                        }
                     });
                 } catch (e2) {
                     Alert.show(e2.message);

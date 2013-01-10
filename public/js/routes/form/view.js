@@ -14,22 +14,20 @@ define([
     function ($, _, ViewFormView) {
         "use strict";
 
-        var cache = [];
-
+        /* note: caching this view needs more thought. This view needs to be refreshed when a fork of the model is
+        created.
+         */
         return function (fid, options) {
-            var store = options.store;
+            var store = options.store,
+                form;
 
-            if (!_.has(cache, fid)) {
-                cache[fid] = new ViewFormView({
-                    collection: store.forms,
-                    model: store.forms.get(fid)
-                });
+            form = new ViewFormView({
+                collection: store.forms,
+                model: store.forms.get(fid)
+            });
 
-                cache[fid].render();
-            } else {
-                cache[fid].delegateEvents();
-            }
+            form.render();
 
-            $('#content').html(cache[fid].el);
+            $('#content').html(form.el);
         };
     });

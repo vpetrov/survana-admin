@@ -12,10 +12,12 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'models/form',
     'views/alert',
-    'views/form/highlighter'
+    'views/form/highlighter',
+    'errors'
 ],
-    function ($, _, Backbone, Alert, Highlighter) {
+    function ($, _, Backbone, Form, Alert, Highlighter, Errors) {
         "use strict";
 
         return Backbone.View.extend({
@@ -25,7 +27,7 @@ define([
             highlighter: null,
 
             initialize: function () {
-                _.bindAll(this, 'render', 'publish', 'onPublishClick', 'onVersionClick');
+                _.bindAll(this, 'render', 'preview', 'publish', 'onPublishClick', 'onPreviewClick', 'onVersionClick');
 
                 if (!this.model) {
                     Alert.modal('This form does not exist.');
@@ -36,8 +38,10 @@ define([
             },
 
             events: {
-                'click #btn-form-publish': 'onPublishClick',
-                'click #btn-form-edit': 'onEditClick',
+                'click .btn-form-preview': 'onPreviewClick',
+                'click .btn-form-publish': 'onPublishClick',
+                'click .btn-form-edit': 'onEditClick',
+                'click .btn-form-fork': 'onForkClick',
                 'click ul.dropdown-menu li': 'onVersionClick'
             },
 
@@ -57,7 +61,8 @@ define([
 
                 //version menu
                 $(this.el).find('.form-versions').replaceWith(this.menuTemplate({
-                    'group': group
+                    'group': group,
+                    'onlyPublished': false
                 }));
 
                 //highlighter
@@ -75,8 +80,24 @@ define([
                 return this;
             },
 
+            preview: function () {
+                var form = this.$el.find('form.preview'),
+                    previewId = 'formpreview_' + this.model.get('id');
+
+                form.find('input').val(JSON.stringify(this.model.toJSON()));
+
+                //register the submit handler
+                form.submit(function () {
+                    window.open('', previewId);
+                    this.target = previewId;
+                });
+
+                //submit the form
+                form.submit();
+            },
+
             publish: function () {
-                if (this.model.get('publish')) {
+                if (this.model.get('published')) {
                     return;
                 }
 
@@ -85,13 +106,56 @@ define([
                 },
                     {
                         'wait': true,
-                        'success': function () {
-                            console.log('success');
+                        'success': function (model, updates) {
+                            model.set(updates, {silent: true});
                         },
                         'error': function (model, result, caller) {
-                            console.log('no success', model, result, caller);
+                            console.error('Failed to publish form', model, result, caller);
                         }
                     });
+            },
+
+            fork: function () {
+                var newmodel,
+                    data,
+                    forms = this.collection,
+                    el = this.$el,
+                    router = this.router;
+
+                if (!this.model.get('published')) {
+                    return;
+                }
+
+                newmodel = new Form();
+                data = this.model.toJSON();
+
+                //remove properties that shouldn't be present in a fork of the current form
+                delete data.id;
+                delete data.created_on;
+                data.published = false;
+                data.version = data.version + ' copy';
+
+                try {
+                    newmodel.save(data, {
+                        'wait': true,
+                        'success': function (model, updates) {
+                            model.set(updates, {silent: true});
+                            forms.add(model);
+
+                            router.navigate('form/' + model.get('id'), {'trigger': true});
+                        },
+                        'error': this.onSubmitError
+                    });
+                } catch (err) {
+                    console.error(err, err.message);
+                }
+            },
+
+            onPreviewClick: function (e) {
+                this.preview();
+
+                e.preventDefault();
+                return false;
             },
 
             onPublishClick: function (e) {
@@ -107,6 +171,13 @@ define([
                 return false;
             },
 
+            onForkClick: function (e) {
+                this.fork();
+
+                e.preventDefault();
+                return false;
+            },
+
             onVersionClick: function (e) {
                 var target = e.currentTarget,
                     formUrl = '#form/' + $(target).children('a').attr('data-form-id');
@@ -116,6 +187,10 @@ define([
 
                 e.preventDefault();
                 return false;
+            },
+
+            onSubmitError: function (model, result, caller) {
+                Errors.onSubmit(this, model, result, caller);
             }
         });
 
