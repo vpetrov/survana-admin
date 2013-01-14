@@ -20,25 +20,50 @@ define([
             template: _.template($('#tpl-alert').html()),
             modalTemplate: _.template($('#tpl-modal-alert').html()),
             modalFormTemplate: _.template($('#tpl-modal-form').html()),
+            modalPromptTemplate: _.template($('#tpl-modal-prompt').html()),
 
-            modalFormSave:null,
+            modalFormSave: null,
+            modalPromptCallback: null,
 
             defaults: {
                 'message': 'An error has occurred. That\'s all we know.',
-                'title': 'Oops!'
+                'title': 'Oops!',
+                'buttons': ['Ok']
             },
 
             events: {
+                'click .btn-modal-prompt': 'onModalPromptClick',
                 'click .modal-form-save': 'onModalFormSave',
                 'submit form': 'onModalFormSubmit'
             },
 
             initialize: function () {
-                _.bindAll(this, 'show', 'modal', 'form', 'onModalFormSave', 'onModalFormSubmit');
+                _.bindAll(this, 'show', 'modal', 'form', 'onModalFormSave', 'onModalFormSubmit', 'onModalPromptClick');
             },
 
             render: function () {
 
+            },
+
+            /**
+             *
+             * @param question  {String}
+             * @param title     {String}
+             * @param buttons   {Object} {label:(int)default}
+             */
+            ask: function (question, title, buttons, callback) {
+                var data= {
+                    'message': question || this.defaults.message,
+                    'title': title || this.defaults.title,
+                    'buttons': buttons || this.defaults.buttons
+                };
+
+                this.modalPromptCallback = callback;
+
+                $(this.el).html(this.modalPromptTemplate(data));
+
+                $('body').append(this.el);
+                $(this.el).children('.modal').modal();
             },
 
             show: function (message) {
@@ -103,6 +128,18 @@ define([
                 $(e.currentTarget).parents('.modal').modal('hide');
 
                 return true;
+            },
+
+            onModalPromptClick: function (e) {
+
+                $(e.currentTarget).parents('.modal').modal('hide');
+
+                if (this.modalPromptCallback) {
+                    this.modalPromptCallback($(e.currentTarget).attr('data-button'));
+                }
+
+                e.preventDefault();
+                return false;
             }
         }))();
 

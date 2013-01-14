@@ -846,6 +846,25 @@
     </div>
 </script>
 
+<script id="tpl-modal-prompt" type="text/template">
+    <div class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+            <h3><%- title %></h3>
+        </div>
+        <div class="modal-body">
+            <p><%= message %></p>
+        </div>
+        <div class="modal-footer">
+            <% for (var i in buttons) { %>
+                <a href="#" class="btn btn-modal-prompt <%= (buttons[i]?'btn-primary':'')%>" data-button="<%= i %>"><%= i %></a>
+            <% } %>
+
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        </div>
+    </div>
+</script>
+
 <script id="store-forms" type="text/store">
     {{- JSON.stringify(forms) }}
 </script>

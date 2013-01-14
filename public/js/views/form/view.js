@@ -159,7 +159,18 @@ define([
             },
 
             onPublishClick: function (e) {
-                this.publish();
+
+                var view = this;
+
+                Alert.ask("Are you sure you would like to publish this form? " +
+                    "You will not be able to edit it in the future.",
+                    "Confirm action",
+                    {"Publish": 1},
+                    function (button) {
+                        if (button === 'Publish') {
+                            view.publish();
+                        }
+                    });
 
                 e.preventDefault();
                 return false;
