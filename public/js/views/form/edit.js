@@ -28,7 +28,7 @@ define([
                 console.log('Initializing Edit Form View', options);
 
                 _.bindAll(this, 'submit', 'onCancelClick', 'onSaveClick', 'onSubmitError', 'onValidationError',
-                                'onSaveShortcut', 'setSaveStatus');
+                                'onShortcut', 'setSaveStatus');
 
                 $(window).keydown($.proxy(this.onShortcut,this));
             },
