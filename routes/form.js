@@ -38,6 +38,8 @@ exports.create = function (req, res, next) {
         form.data = JSON.parse(form.data);
     }
 
+    obj.mongoEscape(form.data);
+
     async.auto({
 
         'formCollection': [function (next2) {
@@ -110,6 +112,8 @@ exports.update = function (req, res, next) {
     if (typeof (form) !== 'object') {
         throw 'Invalid request';
     }
+
+    obj.mongoEscape(form);
 
     async.auto({
         'formCollection': [function (next2) {
