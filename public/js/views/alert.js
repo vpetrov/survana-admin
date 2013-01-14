@@ -45,14 +45,14 @@ define([
 
             },
 
-            /**
-             *
+            /** Displays a prompt with the specified buttons (plus Cancel)
              * @param question  {String}
              * @param title     {String}
              * @param buttons   {Object} {label:(int)default}
+             * @param callback  {Function} A callback of the form: function (button_label)
              */
             ask: function (question, title, buttons, callback) {
-                var data= {
+                var data = {
                     'message': question || this.defaults.message,
                     'title': title || this.defaults.title,
                     'buttons': buttons || this.defaults.buttons
@@ -88,7 +88,7 @@ define([
 
             /**
              *
-             * @param data
+             * @param formdata
              * @param title
              * @param onsave callback for the 'Save' button. If it returns false, the modal form is not closed.
              */

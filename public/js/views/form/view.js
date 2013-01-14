@@ -119,7 +119,6 @@ define([
                 var newmodel,
                     data,
                     forms = this.collection,
-                    el = this.$el,
                     router = this.router;
 
                 if (!this.model.get('published')) {
@@ -133,7 +132,7 @@ define([
                 delete data.id;
                 delete data.created_on;
                 data.published = false;
-                data.version = data.version + ' copy';
+                data.version += ' copy';
 
                 try {
                     newmodel.save(data, {
