@@ -112,9 +112,9 @@
                     <div class="row span6" id="messages"></div>
                     <div class="row span6">
                         <div class="page-header">
-                            <h1>Create Questionnaire
+                            <h2>Create Questionnaire
                                 <small>// expert mode</small>
-                            </h1>
+                            </h2>
                         </div>
                         <form id='create-form' class="form-vertical" onsubmit="return false">
                           <fieldset>
@@ -176,9 +176,9 @@
                     <div class="row span6" id="messages"></div>
                     <div class="row span6">
                         <div class="page-header">
-                            <h1 style="display:inline"><%- title %>
+                            <h2 style="display:inline"><%- title %>
                                 <small>//<%- id %></small>
-                            </h1>
+                            </h2>
                         </div>
                         <!-- Created -->
                         <div class="row">
@@ -216,22 +216,25 @@
 
                         <% if (data) { %>
                             <div class="row">
-                                <div class="span2 muted"></div>
-                                <div class="span4" style="text-align:right">
+                                <div class="span3">
                                     <button class="btn btn-info btn-medium btn-form-preview" style="margin-left:5px">
                                         <i class="icon-eye-open icon-white"></i> Preview
                                     </button>
-                                    <% if (!published) { %>
-                                        <a class="btn btn-primary btn-medium btn-form-publish" href="#">
-                                            <i class="icon-globe icon-white"></i> Publish
-                                        </a>
-                                        <a class="btn btn-warning btn-medium btn-form-edit" href="#">
-                                            <i class="icon-edit icon-white"></i> Edit
-                                        </a>
+                                    <% if (published) { %>
+                                    <button class="btn btn-warning btn-medium btn-form-fork">
+                                        <i class="icon-random icon-white"></i> Fork
+                                    </button>
                                     <% } else { %>
-                                        <button class="btn btn-warning btn-medium btn-form-fork">
-                                            <i class="icon-random icon-white"></i> Fork
-                                        </button>
+                                    <a class="btn btn-warning btn-medium btn-form-edit" href="#">
+                                        <i class="icon-edit icon-white"></i> Edit
+                                    </a>
+                                    <% } %>
+                                </div>
+                                <div class="span3" style="text-align:right">
+                                    <% if (!published) { %>
+                                    <a class="btn btn-primary btn-medium btn-form-publish" href="#">
+                                        <i class="icon-globe icon-white"></i> Publish
+                                    </a>
                                     <% } %>
                                 </div>
                             </div>
@@ -273,9 +276,9 @@
                     <div class="row span6" id="messages"></div>
                     <div class="row span6">
                         <div class="page-header">
-                            <h1>Edit <%=title%>
+                            <h2>Edit <%=title%>
                                 <small>// <%- id %></small>
-                            </h1>
+                            </h2>
                         </div>
                         <form id='edit-form' class="form-vertical" onsubmit="return false">
                             <fieldset>
@@ -363,7 +366,7 @@
                     <div class="row span6" id="messages"></div>
                     <div class="row span6">
                         <div class="page-header">
-                            <h1>Create Study</h1>
+                            <h2>Create Study</h2>
                         </div>
                         <form class="form-vertical">
 
@@ -443,7 +446,7 @@
                     <div class="row span6" id="messages"></div>
                     <div class="row span6">
                         <div class="page-header">
-                            <h1><%- study.title %></h1>
+                            <h2><%- study.title %></h2>
                         </div>
                         <div class="well">
                             <div class="row">
@@ -570,7 +573,7 @@
                     <div class="row span6" id="messages"></div>
                     <div class="row span6">
                         <div class="page-header">
-                            <h1>Edit1 <%-study.title%></h1>
+                            <h2>Edit <%-study.title%></h2>
                         </div>
                         <form class="form-vertical">
 
