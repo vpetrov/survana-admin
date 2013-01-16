@@ -30,7 +30,7 @@ define([
                 _.bindAll(this, 'submit', 'onCancelClick', 'onSaveClick', 'onSubmitError', 'onValidationError',
                                 'onShortcut', 'setSaveStatus');
 
-                $(window).keydown($.proxy(this.onShortcut,this));
+                $(window).keydown($.proxy(this.onShortcut, this));
             },
 
             events: {
