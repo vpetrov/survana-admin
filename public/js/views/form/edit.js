@@ -141,7 +141,7 @@ define([
 
                 var data = {},
                     router = this.router,
-                    form = this.$el.find('form'),
+                    form = this.$el.find('form.edit'),
                     context = this;
 
                 //copy all form values into the study object
