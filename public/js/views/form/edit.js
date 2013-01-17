@@ -158,6 +158,7 @@ define([
                     this.onValidationError({
                         'data': 'Invalid JSON object'
                     }, [e1]);
+
                     return false;
                 }
 
@@ -190,10 +191,12 @@ define([
             },
 
             onSubmitError: function (model, result, caller) {
+                this.saving = false;
                 Errors.onSubmit(this, model, result, caller);
             },
 
             onValidationError: function (model, errors) {
+                this.saving = false;
                 var msg = "",
                     e;
 
