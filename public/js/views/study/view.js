@@ -164,8 +164,6 @@ define([
                             model.set(updates, {silent: true});
                             studies.add(model);
 
-                            el.find('#btn-study-fork').button('reset');
-
                             router.navigate('study/' + model.get('id'), {'trigger': true});
                         },
                         'error': this.onSubmitError
@@ -199,9 +197,16 @@ define([
 
             onForkClick: function (e) {
 
-                this.$el.find('#btn-study-fork').attr('disabled', 'disabled');
+                var view = this;
 
-                this.fork();
+                Alert.ask("Are you sure you would like to create a copy of this study? ",
+                    "Confirm action",
+                    {"Fork": 1},
+                    function (button) {
+                        if (button === 'Fork') {
+                            view.fork();
+                        }
+                    });
 
                 e.preventDefault();
                 return false;

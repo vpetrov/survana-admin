@@ -30,7 +30,10 @@ define([
                 _.bindAll(this, 'submit', 'onCancelClick', 'onSaveClick', 'onSubmitError', 'onValidationError',
                                 'onShortcut', 'setSaveStatus');
 
-                $(window).keydown($.proxy(this.onShortcut, this));
+                //remove previous handlers
+                $(window).unbind('keydown.form_edit');
+                //add new handler
+                $(window).bind('keydown.form_edit', $.proxy(this.onShortcut, this));
             },
 
             events: {
@@ -55,14 +58,15 @@ define([
             },
 
             preview: function () {
-                var form = this.$el.find('form.preview');
+                var form = this.$el.find('form.preview'),
+                    previewId = 'formpreview_' + this.model.get('id');
 
                 form.find('input').val(JSON.stringify(this.model.toJSON()));
 
                 //register the submit handler
                 form.submit(function () {
-                    window.open('', 'formpreview');
-                    this.target = 'formpreview';
+                    window.open('', previewId);
+                    this.target = previewId;
                 });
 
                 //submit the form

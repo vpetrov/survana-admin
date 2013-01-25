@@ -59,7 +59,6 @@ define([
             },
 
             render: function () {
-                console.log('render study/edit.js');
                 this.formGroupView.render();
                 this.studyFormsView.render();
 

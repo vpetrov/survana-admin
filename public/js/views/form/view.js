@@ -121,10 +121,6 @@ define([
                     forms = this.collection,
                     router = this.router;
 
-                if (!this.model.get('published')) {
-                    return;
-                }
-
                 newmodel = new Form();
                 data = this.model.toJSON();
 
@@ -157,6 +153,28 @@ define([
                 return false;
             },
 
+            onEditClick: function (e) {
+                this.router.navigate('form/' + this.model.get('id') + '/edit', {trigger: true});
+                e.preventDefault();
+                return false;
+            },
+
+            onForkClick: function (e) {
+                var view = this;
+
+                Alert.ask("Are you sure you would like to create a copy of this form? ",
+                    "Confirm action",
+                    {"Fork": 1},
+                    function (button) {
+                        if (button === 'Fork') {
+                            view.fork();
+                        }
+                    });
+
+                e.preventDefault();
+                return false;
+            },
+
             onPublishClick: function (e) {
 
                 var view = this;
@@ -170,19 +188,6 @@ define([
                             view.publish();
                         }
                     });
-
-                e.preventDefault();
-                return false;
-            },
-
-            onEditClick: function (e) {
-                this.router.navigate('form/' + this.model.get('id') + '/edit', {trigger: true});
-                e.preventDefault();
-                return false;
-            },
-
-            onForkClick: function (e) {
-                this.fork();
 
                 e.preventDefault();
                 return false;

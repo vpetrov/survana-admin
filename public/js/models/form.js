@@ -14,13 +14,14 @@ define([
         "use strict";
 
         return Backbone.Model.extend({
-            urlRoot:  'form',  //TODO: fix url
+            urlRoot:  'form',
             defaults: function () {
                 return {
                     gid:        0,
                     group:      "",
                     code:       "",
                     title:      "",
+                    display_title: true,
                     version:    "",
                     created_on: 0,
                     data:       "",
@@ -35,6 +36,7 @@ define([
                         "group":        this.get('group')       || this.defaults.group,
                         "code":         this.get('code')        || this.defaults.code,
                         "title":        this.get('title')       || this.defaults.title,
+                        "display_title": this.get('display_title') || this.defaults.display_title,
                         "version":      this.get('version')     || this.defaults.version,
                         "created_on":   this.get('created_on')  || this.defaults.created_on,
                         "data":         this.get('data')        || this.defaults.data,
