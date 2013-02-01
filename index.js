@@ -11,8 +11,48 @@
 var moduleName = require("./package.json").name;
 var path = require('path');
 var fs = require('fs');
+var passport = require('passport');
+var auth = require('./lib/auth');
 
 exports.config = require('./config');
+
+/**
+ * Ensures that all admin pages are only accessible to authenticated users
+ * @param req
+ * @param res
+ * @param next
+ * @return {*}
+ */
+exports.ensureAuthenticated = function (req, res, next) {
+    "use strict";
+
+    if (req.isAuthenticated()) {
+        return next();
+    }
+
+
+    return res.redirect('login');
+};
+
+exports.routing = function (app, config, method, route, controller, action, handler) {
+    "use strict";
+
+    var routes = config.auth.routes;
+
+    //check to see if there is a special auth.routes entry for this route
+    if (routes[method] && (routes[method][route] !== undefined)) {
+        //if there is, then if it's true, this route needs to be protected
+        if (routes[method][route] === true) {
+            return exports.ensureAuthenticated;
+        }
+    } else if (config.auth['default'] === true) {
+        //else, there is no exception for this route and by default, it must be protected
+        return exports.ensureAuthenticated;
+    }
+
+    //by default do not return any middleware routing functions
+    return null;
+};
 
 exports.server = function (survana, express) {
     "use strict";
@@ -30,6 +70,10 @@ exports.server = function (survana, express) {
 
         app.use(express.methodOverride());
         app.use(express.bodyParser());
+        app.use(express.cookieParser());
+        app.use(express.session({ secret: 'Survana:)' }));
+        app.use(passport.initialize());
+        app.use(passport.session());
         app.use(express['static'](__dirname + '/public')); //'static' is a reserved keyword
         app.use(app.router);
 
@@ -38,7 +82,7 @@ exports.server = function (survana, express) {
     });
 
     //set up routes
-    survana.routing(app, this.config.routes);
+    survana.routing(app, this.config, this.routing);
 
     app.log.info('reporting in!');
 
@@ -54,6 +98,8 @@ exports.server = function (survana, express) {
         });
 
     this.config.publishers = survana.readKeys(this.config.publishers);
+
+    auth.setup(app);
 
     return this.app;
 };

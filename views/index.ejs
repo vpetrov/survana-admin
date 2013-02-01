@@ -30,26 +30,41 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
+
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
+          <!-- brand -->
           <a class="brand" href="#">{{= config.brand }}</a>
-          <div class="nav-collapse">
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
               <li><a href="#study/create">Create</a></li>
               <li><a href="#about" onclick="return false">About</a></li>
             </ul>
-          </div>
+            <div class="nav-collapse collapse">
+              <ul class="nav nav-list">
+                  <li class="divider-vertical"></li>
+                  <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                          <i class="icon-user icon-white"></i> {{= user.name }}
+                          <b class="caret"></b></a>
+                      <ul class="dropdown-menu">
+                          <li><a href="{{=config.prefix}}logout"><i class="icon-off"></i> Logout</a></li>
+                      </ul>
+                  </li>
+              </ul>
+            </div>
         </div>
       </div>
-        <div class="github-fork-ribbon-wrapper right" style="z-index: 9999">
+        <!--
+        <div class="github-fork-ribbon-wrapp>right" style="z-index: 9999">
             <div class="github-fork-ribbon">
                 <a href="#">Survana v{{=pkg.version}}/&#945;</a>
             </div>
         </div>
+        -->
     </div>
 
 <div id='content'>
@@ -68,11 +83,19 @@
                     <li>
                         <a href="#home-form-list" data-toggle="tab">Forms</a>
                     </li>
+                    <li>
+                        <a href="#home-user-tab" data-toggle="tab">Users</a>
+                    </li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="home-study-list">
                     </div>
                     <div class="tab-pane" id="home-form-list">
+                    </div>
+                    <div class="tab-pane" id="home-user-tab">
+                        <div id="home-user-create"></div>
+                        <hr>
+                        <div id="home-user-list"></div>
                     </div>
                 </div>
             </div>
@@ -814,7 +837,48 @@
     </ul>
 </script>
 
-<script id="tpl-alert" type="text/template">
+<script id="tpl-user-list" type="text/template">
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Last login</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% _.each(items,function(item){ %>
+        <%= itemTemplate({'user':item}) %>
+        <% }); %>
+        </tbody>
+    </table>
+</script>
+
+
+<script id="tpl-user-list-item" type="text/template">
+    <tr>
+        <td>
+            <%- user.name %>
+        </td>
+        <td>
+            <%- user.email %>
+        </td>
+        <td>
+            <%- (user.last_login)?(new Date(user.last_login)).toLocaleDateString():'Never' %>
+        </td>
+    </tr>
+</script>
+
+<script id='tpl-user-create' type='text/template'>
+    <form id='create-user' class="form-inline" onsubmit="return false">
+        <input type="text" class="input-medium" id="user-email" name="email" rel="tooltip" title="E-mail"
+               placeholder="E-mail">
+        <button type="submit" class="btn btn-add-user">Add</button>
+    </form>
+</script>
+
+
+    <script id="tpl-alert" type="text/template">
     <div class="alert">
         <button class="close" data-dismiss="alert">×</button>
         <span class="alert-message"><%- message %></span>
@@ -883,8 +947,12 @@
     {{- JSON.stringify(publishers) }}
 </script>
 
+<script id="store-users" type="text/store">
+    {{- JSON.stringify(users) }}
+</script>
 
-<script data-main="{{=config.prefix}}js/app" src="{{=config.prefix}}js/{{=config.lib.require}}/require.js"></script>
+
+    <script data-main="{{=config.prefix}}js/app" src="{{=config.prefix}}js/{{=config.lib.require}}/require.js"></script>
 <script type="text/javascript">
     //configure RequireJS
     requirejs.config({

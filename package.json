@@ -13,8 +13,10 @@
         "async":    "0.1.x",
         "ursa":     "0.7.x",
         "vows":     "0.6.x",
-        "request":  "2.x.x"
-
+        "request":  "2.x.x",
+        "passport": "0.1.x",
+        "passport-openid": "0.2.x",
+        "passport-google": "0.2.x"
     },
     "scripts": {
         "test": "vows --spec test/*"

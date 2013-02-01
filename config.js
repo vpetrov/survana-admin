@@ -8,6 +8,8 @@
 
 exports.title = 'Survana Administration';
 
+exports.publicURL = '';
+
 //the first server listed is the default publishing server
 exports.publishers = {
 };
@@ -24,16 +26,21 @@ exports.encryption = {
 
 exports.routes = {
     'GET': {
-        '/': 'index',
-        '/study': {'study': 'list'},
-        '/study/:id': {'study': 'get'},
-        '/form': {'form': 'list'},
-        '/form/:id': {'form': 'get'}
+        '/':                    'index',
+        '/login':               'auth',
+        '/login/openid/return': {'auth':    'openid_return'},
+        '/study':               {'study':   'list'},
+        '/study/:id':           {'study':   'get'},
+        '/form':                {'form':    'list'},
+        '/form/:id':            {'form':    'get'},
+        '/logout':              {'auth':    'logout'}
     },
 
     'POST': {
-        '/study': {'study': 'create'},
-        '/form': {'form': 'create'}
+        '/login':   {'auth':    'login'},
+        '/study':   {'study':   'create'},
+        '/form':    {'form':    'create'},
+        '/user':    {'user':    'create'}
     },
 
     'PUT': {
@@ -44,6 +51,25 @@ exports.routes = {
     'DELETE': {
         '/study/:id': {'study': 'remove'},
         '/form/:id': {'form': 'remove'}
+    }
+};
+
+//openid URLs must start with a slash
+exports.auth = {
+    'superuser': '',
+    'openid': {
+        'login': '/login',
+        'callback': '/login/openid/return'
+    },
+    'default': true,
+    routes : {
+        'GET': {
+            '/login': false,
+            '/login/openid/return': false
+        },
+        'POST': {
+            '/login': false
+        }
     }
 };
 

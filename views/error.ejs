@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <style>
+            body {
+                background-color:#eee;
+            }
+            .center {
+                background-color: #fff;
+                margin:200px auto;
+                width:640px;
+                font-family: Georgia;
+                border-radius: 10px;
+                border:1px solid gray;
+                padding: 0px 50px 20px 50px;
+            }
+
+            h2 {
+                padding:10px;
+                text-align:center;
+            }
+
+            hr {
+                color: #d3d3d3;
+            }
+
+            p.message {
+                padding-left:25px;
+                color:#8b0000;
+                font-size:larger;
+            }
+
+            pre {
+                overflow: scroll;
+                border-left:2px solid lightblue;
+                color: gray;
+                font-size:smaller;
+                font-family: arial;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div class="center">
+            <h2>Oops, something really bad has happened:</h2>
+            <hr>
+            <p class="message">
+                {{= err.message }}
+            </p>
+            <hr>
+            <p class="ps">A <i>highly</i> skilled team of expert monkeys is already on the way. Sit tight or
+                <a href="javascript:window.history.back()">go back</a>.
+            </p>
+
+            {{ if (req.header('Host').indexOf('localhost')>-1) { }}
+            <br>
+            <h5>Food for thought:</h5>
+            <pre>
+                {{= err.stack }}
+            </pre>
+            {{ } }}
+        </div>
+    </body>
+</html>

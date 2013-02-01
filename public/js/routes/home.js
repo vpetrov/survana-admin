@@ -22,7 +22,8 @@ define([
             if (!cache.homeView) {
                 cache.homeView = new HomeView({
                     collection: store.forms,
-                    study_collection: store.studies
+                    study_collection: store.studies,
+                    user_collection: store.users
                 });
 
                 cache.homeView.render();

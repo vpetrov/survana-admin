@@ -6,18 +6,10 @@
  * @license New BSD License (see LICENSE file for details).
  */
 
-var path = require('path');
 var async = require('async');
 var pkg = require('../package.json');
-
-var study_blacklist = {
-    '_id': 0,
-    'keys': 0
-};
-
-var form_blacklist = {
-    '_id': 0
-};
+var urlutil = require('../lib/urlutil');
+var blacklist = require('../lib/blacklist');
 
 exports.index = function (req, res, next) {
     "use strict";
@@ -32,6 +24,12 @@ exports.index = function (req, res, next) {
         return;
     }
 
+    //and that the request url doesn't have multiple slashes at the end (it messes up url routing)
+    if (req.originalUrl[len - 2] === '/') {
+        res.redirect(urlutil.normalize(req.originalUrl));
+        return;
+    }
+
     async.auto({
         //get the 'study' collection
         'studyCollection': function (next2) {
@@ -43,18 +41,26 @@ exports.index = function (req, res, next) {
             db.collection('form', next2);
         },
 
+        'userCollection': function (next2) {
+            db.collection('user', next2);
+        },
+
         //find all study documents, prevent _id from showing up
         'studies': ['studyCollection', function (next2, result) {
-            result.studyCollection.find({}, study_blacklist).toArray(next2);
+            result.studyCollection.find({}, blacklist.study).toArray(next2);
         }],
 
         //find all form documents, prevent '_id' from showing up
         'forms': ['formCollection', function (next2, result) {
-            result.formCollection.find({}, form_blacklist).toArray(next2);
+            result.formCollection.find({}, blacklist.form).toArray(next2);
+        }],
+
+        'users': ['userCollection', function (next2, result) {
+            result.userCollection.find({}, blacklist.user).toArray(next2);
         }]
     },
         //render the index page with the form and study datasets
-        function dislayPage(err, result) {
+        function displayPage(err, result) {
 
             var publishers = app.config.publishers,
                 serverNames = [],
@@ -72,12 +78,15 @@ exports.index = function (req, res, next) {
                     }
                 }
             }
+            console.log('user',req.user);
 
             res.render('index', {
                 config: app.config,
+                user: req.user,
                 forms: result.forms,
                 studies: result.studies,
                 publishers: serverNames,
+                users: result.users,
                 pkg: pkg
             });
         });
