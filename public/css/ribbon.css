@@ -90,3 +90,9 @@
     -o-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
+
+@media all and (max-width:480px) {
+    .github-fork-ribbon-wrapper {
+        display:none;
+    }
+}
