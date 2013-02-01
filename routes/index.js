@@ -78,7 +78,6 @@ exports.index = function (req, res, next) {
                     }
                 }
             }
-            console.log('user',req.user);
 
             res.render('index', {
                 config: app.config,
