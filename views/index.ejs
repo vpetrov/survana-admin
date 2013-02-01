@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
   <head>
     <meta charset="utf-8">
     <title>{{= config.title }}</title>
@@ -31,7 +31,7 @@
       <div class="navbar-inner">
         <div class="container">
 
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse" style="float:left">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -39,9 +39,8 @@
           <!-- brand -->
           <a class="brand" href="#">{{= config.brand }}</a>
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#study/create">Create</a></li>
-              <li><a href="#about" onclick="return false">About</a></li>
+              <li class="active"><a href="#"><i class="icon-home icon-white"></i> Home</a></li>
+              <li><a href="#study/create"><i class="icon-plus icon-white"></i> Create</a></li>
             </ul>
             <div class="nav-collapse collapse">
               <ul class="nav nav-list">
@@ -54,17 +53,19 @@
                           <li><a href="{{=config.prefix}}logout"><i class="icon-off"></i> Logout</a></li>
                       </ul>
                   </li>
+                  <li class="divider-vertical"></li>
+
+                  <li><a href="#about" onclick="return false"><i class="icon-leaf icon-white"></i> About</a></li>
               </ul>
             </div>
         </div>
       </div>
-        <!--
-        <div class="github-fork-ribbon-wrapp>right" style="z-index: 9999">
+
+        <div class="github-fork-ribbon-wrapper right" style="z-index:99">
             <div class="github-fork-ribbon">
                 <a href="#">Survana v{{=pkg.version}}/&#945;</a>
             </div>
         </div>
-        -->
     </div>
 
 <div id='content'>
@@ -78,13 +79,13 @@
             <div class="span7" id="main-content">
                 <ul class="nav nav-tabs">
                     <li class="active">
-                        <a href="#home-study-list" data-toggle="tab">Studies</a>
+                        <a href="#home-study-list" data-toggle="tab"><i class="icon-folder-close"></i> Studies</a>
                     </li>
                     <li>
-                        <a href="#home-form-list" data-toggle="tab">Forms</a>
+                        <a href="#home-form-list" data-toggle="tab"><i class="icon-check"></i> Forms</a>
                     </li>
                     <li>
-                        <a href="#home-user-tab" data-toggle="tab">Users</a>
+                        <a href="#home-user-tab" data-toggle="tab"><i class="icon-user"></i> Users</a>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -243,16 +244,16 @@
                                     <button class="btn btn-info btn-medium btn-form-preview" style="margin-left:5px">
                                         <i class="icon-eye-open icon-white"></i> Preview
                                     </button>
-                                    <button class="btn btn-warning btn-medium btn-form-edit">
-                                        <i class="icon-edit icon-white"></i> Edit
-                                    </button>
-
                                     <% if (!published) { %>
-                                    <button class="btn btn-primary btn-medium btn-form-publish pull-right" href="#">
-                                        <i class="icon-globe icon-white"></i> Publish
-                                    </button>
+                                        <button class="btn btn-warning btn-medium btn-form-edit">
+                                            <i class="icon-edit icon-white"></i> Edit
+                                        </button>
+                                        <button class="btn btn-primary btn-medium btn-form-publish" href="#"
+                                                style="margin-left:2em">
+                                            <i class="icon-globe icon-white"></i> Publish
+                                        </button>
                                     <% } %>
-                                    <button class="btn btn-medium btn-form-fork pull-right" style="margin-right:5px">
+                                    <button class="btn btn-medium btn-form-fork" style="margin-right:5px">
                                         <i class="icon-random"></i> Fork
                                     </button>
                                 </div>
@@ -873,7 +874,7 @@
     <form id='create-user' class="form-inline" onsubmit="return false">
         <input type="text" class="input-medium" id="user-email" name="email" rel="tooltip" title="E-mail"
                placeholder="E-mail">
-        <button type="submit" class="btn btn-add-user">Add</button>
+        <button type="submit" class="btn btn-add-user"><i class="icon-plus-sign"></i> Add</button>
     </form>
 </script>
 
