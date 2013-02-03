@@ -8,11 +8,12 @@
 
 /** app must have 'log' and 'dirname' properties */
 
-var moduleName = require("./package.json").name;
-var path = require('path');
-var fs = require('fs');
-var passport = require('passport');
-var auth = require('./lib/auth');
+var moduleName = require("./package.json").name,
+    path = require('path'),
+    fs = require('fs'),
+    passport = require('passport'),
+    auth = require('./lib/auth'),
+    HTTP_UNAUTHORIZED = 401;
 
 exports.config = require('./config');
 
@@ -30,6 +31,14 @@ exports.ensureAuthenticated = function (req, res, next) {
         return next();
     }
 
+    //AJAX?
+    if ((req.header('Content-Type') === 'application/json') || (req.header('X-Requested-With') === 'XMLHttpRequest')) {
+        return res.send({
+            success: 0,
+            logged_out: true,
+            message: "Your session has expired. Please <a href='/login'>login</a>"
+        }, HTTP_UNAUTHORIZED);
+    }
 
     return res.redirect('login');
 };
