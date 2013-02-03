@@ -30,7 +30,7 @@ exports.create = function (req, res, next) {
 
         'checkUser': ['existingUser', function (next2, result) {
             if (result.existingUser && result.existingUser.email) {
-                return next2(new Error('This e-mail ' + user.email + ' has already been used.'));
+                return next2(new ClientError('This e-mail ' + user.email + ' has already been used.'));
             }
 
             next2(null, true);

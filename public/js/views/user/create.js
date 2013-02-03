@@ -69,20 +69,8 @@ define([
                 Errors.onSubmit(this, model, result, caller);
             },
 
-            onValidationError: function (model, errors) {
-                var msg = "", e;
-
-                for (e in errors) {
-                    if (errors.hasOwnProperty(e)) {
-                        msg += errors[e] + "\n";
-                    }
-                }
-
-                if (!msg.length) {
-                    msg = "We were unable to validate your input data. Please try again.";
-                }
-
-                Alert.show(msg);
+            onValidationError: function (model, data) {
+                Alert.show(data.message);
             }
         });
 

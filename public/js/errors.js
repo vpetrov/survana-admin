@@ -7,6 +7,7 @@
  */
 
 var HTTP_BAD_REQUEST = 400,
+    HTTP_UNAUTHORIZED = 401,
     HTTP_SUCCESS = 200,
     HTTP_SERVER_ERROR = 500;
 
@@ -18,6 +19,16 @@ define([
         "use strict";
 
         return {
+
+            expiredSession: function (err) {
+                Alert.ask('Please proceed to the login page.', 'Your session has expired', { 'Login': 1 },
+                    function (button) {
+                        if (button === 'Login') {
+                            window.location.reload();
+                        }
+                });
+            },
+
             /** view,model,result,caller(unused) */
             onSubmit: function (view, model, result) {
 
@@ -28,6 +39,9 @@ define([
 
                 //RESTful Web Services, page 372
                 switch (result.status) {
+
+                case HTTP_UNAUTHORIZED:
+                    return this.expiredSession(result);
 
                 //problem on the client
                 case HTTP_BAD_REQUEST:
