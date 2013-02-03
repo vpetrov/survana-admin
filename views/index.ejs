@@ -511,6 +511,9 @@
                                         <% if (overrides && !parseInt(overrides['display_title'])) { %>
                                             <a href="#" rel="tooltip" title="Hide title"><i class="icon-eye-close"></i></a>
                                         <% }  %>
+                                        <% if (!study.forms[i].published) { %>
+                                            <span class="label" rel="tooltip" title="This form has not been finalized">draft</span>
+                                        <% } %>
                                     </li>
                                     <% } %>
                                 </ol>
@@ -783,13 +786,14 @@
         <!-- break -->
         <!-- <li><span style="border-top:1px solid lightgray;display:block"></span></li> -->
         <% for (var i=0; i<group.length; ++i) { %>
-        <% if (onlyPublished && !group[i].published) continue; %>
-        <li>
-            <a href="#" data-form-id='<%- group[i].id %>' data-form-version="<%- group[i].version %>">
-                <%- group[i].title %>
-                <span class="label label-warning"><%- group[i].version %></span>
-            </a>
-        </li>
+            <% if (onlyPublished && !group[i].published) continue; %>
+            <% var label_class = (group[i].published)?'label-success':'' %>
+            <li>
+                <a href="#" data-form-id='<%- group[i].id %>' data-form-version="<%- group[i].version %>">
+                    <%- group[i].title %>
+                    <span class="label <%- label_class %>"><%- group[i].version %></span>
+                </a>
+            </li>
         <% } %>
         <% if (typeof(options)!=='undefined') { %>
         <li class="divider"></li>

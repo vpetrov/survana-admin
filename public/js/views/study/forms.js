@@ -62,7 +62,7 @@ define([
                 items = this.getForms();
 
                 for (i = 0; i < items.length; i += 1) {
-                    groups[items[i].gid] = this.collection.where({'gid': items[i].gid}).map(function(form){
+                    groups[items[i].gid] = this.collection.where({'gid': items[i].gid}).map(function (form) {
                         return form.toJSON();
                     });
                 }
@@ -74,7 +74,7 @@ define([
                     'itemTemplate': this.itemTemplate,
                     'titleTemplate': this.titleTemplate,
                     'menuTemplate': this.menuTemplate,
-                    'onlyPublished': true
+                    'onlyPublished': false
                 }));
 
                 return this;
@@ -157,7 +157,7 @@ define([
                     'group': group,
                     'titleTemplate': this.titleTemplate,
                     'menuTemplate': this.menuTemplate,
-                    'onlyPublished': true
+                    'onlyPublished': false
                 }));
 
                 //replace the placeholder with the real item

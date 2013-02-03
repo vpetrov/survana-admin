@@ -36,15 +36,17 @@ define([
 
             render: function () {
 
-                var models = this.collection.where({'published': true}),
-                    items = _.map(models, function (model) { return model.toJSON(); });
+                //todo: uncomment this and delete the second var decl to restrict studies to published forms only
+                //var models = this.collection.where({'published': true}),
+                //    items = _.map(models, function (model) { return model.toJSON(); });
+                var items = this.collection.toJSON();
 
                     //where({'published': true}).toJSON();
                 $(this.el).html(this.template({
                     //group items by group_id
                     'items': _.groupBy(items, 'gid'),
                     'itemTemplate': this.itemTemplate,
-                    'onlyPublished': true
+                    'onlyPublished': false
                 }));
 
                 return this;
