@@ -17,21 +17,17 @@ define([
         var cache = [];
 
         return function (sid, options) {
-            var store = options.store;
-
-            if (!_.has(cache, sid)) {
-                cache[sid] = new ViewStudyView({
+            var store = options.store,
+                viewStudy = new ViewStudyView({
                     collection: store.studies,
                     forms:      store.forms,
                     publishers: store.publishers,
                     model:      store.studies.get(sid)
                 });
 
-                cache[sid].render();
-            }
+            viewStudy.render();
+            viewStudy.onShow();
 
-            cache[sid].onShow();
-
-            $('#content').html(cache[sid].el);
+            $('#content').html(viewStudy.el);
         };
     }); //define
