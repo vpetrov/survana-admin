@@ -154,10 +154,10 @@ exports.publish = function (serverStudy, servers, req, res, next) {
 
         'fullStudy': ['studyForms', function (next2, result) {
             var found = [],
-                notFound = [],
+                notFound,
                 forms = result.studyForms,
-                index,
-                i;
+                i,
+                j;
 
             if (!forms || !forms.length) {
                 next2(new Error('Failed to get list of forms from the database.'));
@@ -182,9 +182,10 @@ exports.publish = function (serverStudy, servers, req, res, next) {
             //add all the forms in the correct order (since the array returned by mongodb might not match the
             //order in which the user has arranged the forms)
             for (i = 0; i < forms.length; i += 1) {
-                index = clientStudy.forms.indexOf(forms[i].id);
-                if (index > -1) {
-                    serverStudy.forms[index] = forms[i];
+                for (j = 0; j < clientStudy.forms.length; j += 1) {
+                    if (clientStudy.forms[j] === forms[i].id) {
+                        serverStudy.forms[j] = forms[i];
+                    }
                 }
             }
 
