@@ -31,6 +31,7 @@ exports.routes = {
         '/login/openid/return': {'auth':    'openid_return'},
         '/study':               {'study':   'list'},
         '/study/:id':           {'study':   'get'},
+        '/study/:id/key':       {'study':   'key'},
         '/form':                {'form':    'list'},
         '/form/:id':            {'form':    'get'},
         '/logout':              {'auth':    'logout'}

@@ -27,7 +27,7 @@ define([
             initialize: function (options) {
                 //WARNING: If the list contains a bad function name, this code will fail in Safari and Firefox.
                 _.bindAll(this, 'render', 'publish', 'onPublishClick', 'onEditClick',
-                                'onForkClick');
+                                'onForkClick', 'onDownloadKeyClick');
 
                 //TODO: fetch study from the server (back button issue)
                 if (!this.model) {
@@ -44,7 +44,8 @@ define([
             events: {
                 'click .btn-study-publish': 'onPublishClick',
                 'click .btn-study-edit': 'onEditClick',
-                'click .btn-study-fork': 'onForkClick'
+                'click .btn-study-fork': 'onForkClick',
+                'click .btn-study-download-key': 'onDownloadKeyClick'
             },
 
             render: function () {
@@ -209,6 +210,19 @@ define([
                     });
 
                 e.preventDefault();
+                return false;
+            },
+
+            onDownloadKeyClick: function (e) {
+                var url = window.location.origin + window.location.pathname;
+
+                if (url[url.length-1] !== '/') {
+                    url += '/';
+                }
+
+                url += 'study/' + this.model.get('id') + '/key';
+                window.location.assign(url);
+                e.stopPropagation();
                 return false;
             },
 

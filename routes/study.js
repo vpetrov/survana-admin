@@ -193,8 +193,66 @@ exports.update = function (req, res, next) {
         });
 };
 
-exports.remove = function (req, res) {
+exports.remove = function (req, res, next) {
     "use strict";
 
     res.send('Study::remove');
+};
+
+exports.key = function (req, res, next) {
+    "use strict";
+
+    var id  = req.params.id,
+        app = req.app,
+        db  = app.db;
+
+    if (!id) {
+        return next(new ClientError('Invalid request'));
+    }
+
+
+    async.auto({
+        'studyCollection': [function (next2) {
+            db.collection('study', next2);
+        }],
+
+        'study': ['studyCollection', function (next2, result) {
+            //always return what is actually stored in the DB, not what we think was stored.
+            result.studyCollection.findOne({'id': id}, { 'keys': 1 }, next2);
+        }],
+
+        'secretKey': ['study', function (next2, result) {
+            var study = result.study;
+
+            if (!study) {
+                return next2(new ClientError('Study not found.'));
+            }
+
+            if (!study.keys || !study.keys.length) {
+                return next2(new ClientError('No secret key has been found for this study.'));
+            }
+
+            return next2(null, study.keys);
+        }]
+    },
+        function processResult(err, result) {
+
+            var data;
+
+            if (err) {
+                next(err);
+                return;
+            }
+
+            data = JSON.stringify({
+                'server':       app.keyID,
+                'serverURL':    app.config.publicURL,
+                'study':        id,
+                'keys':         result.secretKey
+            });
+
+            res.setHeader('Content-Disposition', 'attachment; filename=' + id + '.key');
+            res.setHeader('Content-Type', 'application/octet-stream');
+            res.send(data);
+        });
 };
