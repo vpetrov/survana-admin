@@ -183,7 +183,7 @@ define([
                             if (callback) {
                                 callback.apply(context, [false]);
                             } else {
-                                this.onSubmitError.apply(context, [false]);
+                                context.onSubmitError.apply(context, [false]);
                             }
                         }
                     });
