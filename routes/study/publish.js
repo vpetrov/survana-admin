@@ -36,7 +36,7 @@ function publishWorker(item, callback) {
         json: {
             'study': study,
             'keyID': keyID,
-            'signature': privateKey.hashAndSign('sha256', JSON.stringify(study), 'utf8', 'hex')
+            'signature': privateKey.hashAndSign('sha256', study, 'utf8', 'hex')
         },
         encoding: 'utf8'
     };
@@ -54,7 +54,7 @@ function publishWorker(item, callback) {
 
         //but if 50 years of network design miraculously brought the bits back over the wire, then read the public URL.
         if (!err) {
-            if (typeof (body) === 'object') {
+            if (typeof body === 'object') {
                 //let's see if the server was nice and returned a meaningful status code (which it should)
                 if (response.statusCode === HTTP_OK) {
                     result.success = 1;    //bitter sweet
@@ -104,7 +104,7 @@ function publish(study, publishers, keyID, privateKey, publishCallback) {
         for (i = 0; i < publishers.length; i += 1) {
             copies.push({
                 'publisher': publishers[i],
-                'study': study,
+                'study': JSON.stringify(study),
                 'keyID': keyID,
                 'privateKey': privateKey
             });
