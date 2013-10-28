@@ -45,7 +45,8 @@ define([
                 'click .btn-study-publish': 'onPublishClick',
                 'click .btn-study-edit': 'onEditClick',
                 'click .btn-study-fork': 'onForkClick',
-                'click .btn-study-download-key': 'onDownloadKeyClick'
+                'click .btn-study-download-key': 'onDownloadKeyClick',
+                'click .btn-study-download-schema': 'onDownloadSchemaClick'
             },
 
             render: function () {
@@ -221,6 +222,19 @@ define([
                 }
 
                 url += 'study/' + this.model.get('id') + '/key';
+                window.location.assign(url);
+                e.stopPropagation();
+                return false;
+            },
+
+            onDownloadSchemaClick: function (e) {
+                var url = window.location.origin + window.location.pathname;
+
+                if (url[url.length - 1] !== '/') {
+                    url += '/';
+                }
+
+                url += 'study/' + this.model.get('id') + '/schema';
                 window.location.assign(url);
                 e.stopPropagation();
                 return false;

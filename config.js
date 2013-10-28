@@ -32,6 +32,7 @@ exports.routes = {
         '/study':               {'study':   'list'},
         '/study/:id':           {'study':   'get'},
         '/study/:id/key':       {'study':   'key'},
+        '/study/:id/schema':    {'study':   'schema'},
         '/form':                {'form':    'list'},
         '/form/:id':            {'form':    'get'},
         '/logout':              {'auth':    'logout'}

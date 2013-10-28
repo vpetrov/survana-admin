@@ -18,7 +18,7 @@
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
     <![endif]-->
 
     <link href="{{=config.prefix}}css/main.css" rel="stylesheet">
@@ -37,7 +37,7 @@
             <span class="icon-bar"></span>
           </a>
           <!-- brand -->
-          <a class="brand" href="#">{{= config.brand }}</a>
+          <a class="brand" href="#"><img class="survana-logo" src="img/logo.png"> {{= config.brand }}</a>
             <ul class="nav">
               <li class="active"><a href="#"><i class="icon-home icon-white"></i> Home</a></li>
               <li><a href="#study/create"><i class="icon-plus icon-white"></i> Create</a></li>
@@ -584,6 +584,11 @@
                                 <li>
                                     <a href="#" class="btn-study-download-key">
                                         <i class="icon-lock"></i> Secret Key
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="btn-study-download-schema">
+                                        <i class="icon-th-large"></i> Schema
                                     </a>
                                 </li>
                             </ul>
