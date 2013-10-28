@@ -109,7 +109,7 @@ exports.schema = function (req, res, next) {
                     };
 
                     if (group !== undefined) {
-                        result.group = group;
+                        qschema.group = group;
                     }
 
                     fields.push(qschema);
