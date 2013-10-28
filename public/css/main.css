@@ -11,6 +11,22 @@ body
 	background-color: #FEFEFE; /* testing */
 }
 
+.survana-logo
+{
+    width:30px;
+    border:0;
+    margin:0;
+    position:relative;
+    top:-2px;
+
+    -webkit-filter: grayscale(100%);
+}
+
+a.brand:hover img.survana-logo
+{
+    -webkit-filter: grayscale(0%);
+}
+
 .build-pad-mv
 {
 	padding-top:10px;
