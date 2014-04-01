@@ -1,6 +1,6 @@
 {
 	"name":		"survana-admin",
-	"version":	"0.2.7",
+	"version":	"0.2.8",
 	"author":	"Victor Petrov <victor_petrov@harvard.edu>",
 	"description":"Survana administration module",
 	"repository":{
